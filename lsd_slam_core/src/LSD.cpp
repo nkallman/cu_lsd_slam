@@ -252,7 +252,7 @@ int main( int argc, char** argv )
 	SlamSystem * system = new SlamSystem(w, h, K, doSlam);
 	system->setVisualization(outputWrapper);
 
-
+    //  TODO: LIVE slam
 	// open image files: first try to open as file.
 	std::string source;
 	if(!(Parse::arg(argc, argv, "-f", source) > 0))
