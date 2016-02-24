@@ -1,11 +1,11 @@
 /*
- * PangolinOutput3DWrapper.cpp
+ * DataOutput3DWrapper.cpp
  *
  *  Created on: 17 Oct 2014
  *      Author: thomas
  */
 
-#include "PangolinOutput3DWrapper.h"
+#include "DataOutput3DWrapper.h"
 
 #include "util/SophusUtil.h"
 #include "util/settings.h"
@@ -16,21 +16,20 @@
 
 namespace lsd_slam {
 
-PangolinOutput3DWrapper::PangolinOutput3DWrapper(int width, int height,
-		GUI & gui) :
+DataOutput3DWrapper::DataOutput3DWrapper(int width, int height, GUI & gui) :
 		width(width), height(height), gui(gui), publishLvl(0) {
 
 }
 
-PangolinOutput3DWrapper::~PangolinOutput3DWrapper() {
+DataOutput3DWrapper::~DataOutput3DWrapper() {
 
 }
 
-void PangolinOutput3DWrapper::updateImage(unsigned char * data) {
+void DataOutput3DWrapper::updateImage(unsigned char * data) {
 	gui.updateImage(data);
 }
 
-void PangolinOutput3DWrapper::publishKeyframe(Frame* f) {
+void DataOutput3DWrapper::publishKeyframe(Frame* f) {
 	Keyframe * fMsg = new Keyframe;
 
 	boost::shared_lock < boost::shared_mutex > lock = f->getActiveLock();
@@ -60,21 +59,32 @@ void PangolinOutput3DWrapper::publishKeyframe(Frame* f) {
 	const float* idepthVar = f->idepthVar(publishLvl);
 	const float* color = f->image(publishLvl);
 
+	std::cout << "Publishing Keyframe\n";
+	std::cout << "KeyframeDepth ";
+	std::cout << "id:" << fMsg->id << " ";
+	std::cout << "fx:" << fMsg->fx << " ";
+	std::cout << "fy:" << fMsg->fy << " ";
+	std::cout << "cx:" << fMsg->cx << " ";
+	std::cout << "cy:" << fMsg->cy << " ";
+	std::cout << "w:" << fMsg->width << " ";
+	std::cout << "h:" << fMsg->height << " ";
 	for (int idx = 0; idx < w * h; idx++) {
 		pc[idx].idepth = idepth[idx];
+		std::cout << "idepth[" << idx << "]:" << pc[idx].idepth << " ";
 		pc[idx].idepth_var = idepthVar[idx];
 		pc[idx].color[0] = color[idx];
 		pc[idx].color[1] = color[idx];
 		pc[idx].color[2] = color[idx];
 		pc[idx].color[3] = color[idx];
 	}
+	std::cout << std::endl;
 
 	lock.unlock();
 
 	gui.addKeyframe(fMsg);
 }
 
-void PangolinOutput3DWrapper::publishTrackedFrame(Frame* kf) {
+void DataOutput3DWrapper::publishTrackedFrame(Frame* kf) {
 //    lsd_slam_viewer::keyframeMsg fMsg;
 //
 //
@@ -121,7 +131,7 @@ void PangolinOutput3DWrapper::publishTrackedFrame(Frame* kf) {
 //    pose_publisher.publish(pMsg);
 }
 
-void PangolinOutput3DWrapper::publishKeyframeGraph(KeyFrameGraph* graph) {
+void DataOutput3DWrapper::publishKeyframeGraph(KeyFrameGraph* graph) {
 	graph->keyframesAllMutex.lock_shared();
 
 	int num = graph->keyframesAll.size();
@@ -129,16 +139,19 @@ void PangolinOutput3DWrapper::publishKeyframeGraph(KeyFrameGraph* graph) {
 	unsigned char * buffer = new unsigned char[num * sizeof(GraphFramePose)];
 
 	GraphFramePose* framePoseData = (GraphFramePose*) buffer;
+	std::cout << "Publishing Keyframe Graph\n";
 
 	for (unsigned int i = 0; i < graph->keyframesAll.size(); i++) {
 		framePoseData[i].id = graph->keyframesAll[i]->id();
 		memcpy(framePoseData[i].camToWorld,
 				graph->keyframesAll[i]->getScaledCamToWorld().cast<float>().data(),
 				sizeof(float) * 7);
-
-		for (unsigned int j = 0; j < 7; j++) {
-			std::cout << " " << framePoseData[i].camToWorld[j];
-		}
+//		output framePoseData
+//		std::cout << "GraphFramePose id:" << framePoseData[i].id << ", data:";
+//		for (unsigned int j = 0; j < 7; j++) {
+//			std::cout << " " << framePoseData[i].camToWorld[j];
+//		}
+//		std::cout << std::endl;
 	}
 
 	graph->keyframesAllMutex.unlock_shared();
@@ -147,19 +160,18 @@ void PangolinOutput3DWrapper::publishKeyframeGraph(KeyFrameGraph* graph) {
 	delete[] buffer;
 }
 
-void PangolinOutput3DWrapper::publishTrajectory(
+void DataOutput3DWrapper::publishTrajectory(
 		std::vector<Eigen::Matrix<float, 3, 1>> trajectory,
 		std::string identifier) {
 	//TODO
 }
 
-void PangolinOutput3DWrapper::publishTrajectoryIncrement(
+void DataOutput3DWrapper::publishTrajectoryIncrement(
 		Eigen::Matrix<float, 3, 1> pt, std::string identifier) {
 	//TODO
 }
 
-void PangolinOutput3DWrapper::publishDebugInfo(
-		Eigen::Matrix<float, 20, 1> data) {
+void DataOutput3DWrapper::publishDebugInfo(Eigen::Matrix<float, 20, 1> data) {
 	//TODO
 }
 
