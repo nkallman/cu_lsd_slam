@@ -27,6 +27,7 @@
 #include "util/ThreadMutexObject.h"
 #include "IOWrapper/Pangolin/PangolinOutput3DWrapper.h"
 #include "SlamSystem.h"
+#include "util/ImageSource.h"
 
 #include <sstream>
 #include <fstream>
@@ -39,6 +40,9 @@
 #include "opencv2/opencv.hpp"
 
 #include "GUI.h"
+
+// TREVOR: IMAGE SOURCE VARIABLE
+ImageSource imageSource;
 
 std::vector<std::string> files;
 int w, h, w_inp, h_inp;
@@ -139,11 +143,15 @@ void run(SlamSystem * system, Undistorter* undistorter,
 	int runningIDX = 0;
 	float fakeTimeStamp = 0;
 
-	for (unsigned int i = 0; i < numFrames; i++) {
+	// TREVOR: change for loop to while so it runs until image source has gone to end
+	// goes on infinitely for cameras
+	//for (unsigned int i = 0; i < numFrames; i++) {
+	while(!imageSource.IsEndOf()) {
 		if (lsdDone.getValue())
 			break;
 
 		cv::Mat imageDist = cv::Mat(h, w, CV_8U);
+		imageDist = imageSource.GetNextImage();
 
 		if (logReader) {
 			logReader->getNext();
@@ -165,6 +173,10 @@ void run(SlamSystem * system, Undistorter* undistorter,
 							imageDist.rows);
 				continue;
 			}
+		}
+
+		if(imageDist.empty()) {
+			continue;
 		}
 
 		assert(imageDist.type() == CV_8U);
@@ -241,31 +253,46 @@ int main(int argc, char** argv) {
 	//  TODO: LIVE slam
 	// open image files: first try to open as file.
 	std::string source;
+
+	// TREVOR: if no filename - make image source from cameras
 	if (!(Parse::arg(argc, argv, "-f", source) > 0)) {
-		printf("need source files! (set using -f FOLDER or KLG)\n");
-		exit(0);
-	}
+//		printf("need source files! (set using -f FOLDER or KLG)\n");
+//		exit(0);
 
-	Bytef * decompressionBuffer =
-			new Bytef[Resolution::getInstance().numPixels() * 2];
-	IplImage * deCompImage = 0;
-
-	if (source.substr(source.find_last_of(".") + 1) == "klg") {
-		logReader = new RawLogReader(decompressionBuffer, deCompImage, source);
-
-		numFrames = logReader->getNumFrames();
+		CameraImageSource camSource();
+		imageSource = camSource;
 	} else {
-		if (getdir(source, files) >= 0) {
-			printf("found %d image files in folder %s!\n", (int) files.size(),
-					source.c_str());
-		} else if (getFile(source, files) >= 0) {
-			printf("found %d image files in file %s!\n", (int) files.size(),
-					source.c_str());
-		} else {
-			printf("could not load file list! wrong path / file?\n");
-		}
+		// TREVOR: if has filename, decide whether to make logreader or files source
 
-		numFrames = (int) files.size();
+		Bytef * decompressionBuffer = new Bytef[Resolution::getInstance().numPixels() * 2];
+		IplImage * deCompImage = 0;
+
+		if (source.substr(source.find_last_of(".") + 1) == "klg") {
+			logReader = new RawLogReader(decompressionBuffer, deCompImage,
+					source);
+
+			numFrames = logReader->getNumFrames();
+
+			// TREVOR: imageSource is based on LogReader
+			LogReaderImageSource lrSource(logReader);
+			imageSource = lrSource;
+		} else {
+			if (getdir(source, files) >= 0) {
+				printf("found %d image files in folder %s!\n",
+						(int) files.size(), source.c_str());
+			} else if (getFile(source, files) >= 0) {
+				printf("found %d image files in file %s!\n", (int) files.size(),
+						source.c_str());
+			} else {
+				printf("could not load file list! wrong path / file?\n");
+			}
+
+			numFrames = (int) files.size();
+
+			// TREVOR: imageSource is based on list of files
+			FileListImageSource flSource(files);
+			imageSource = flSource;
+		}
 	}
 
 	boost::thread lsdThread(run, system, undistorter, outputWrapper, K);
