@@ -315,7 +315,7 @@ bool KeyFrameGraph::addElementsFromBuffer() {
 		newKF->pose->isInGraph = true;
 
 		keyframesForRetrack.push_back(newKF);
-		std::cout << "ADDING elements from KF buffer\n";
+//		std::cout << "ADDING elements from KF buffer\n";
 		keyframesAll.push_back(newKF);
 
 		added = true;

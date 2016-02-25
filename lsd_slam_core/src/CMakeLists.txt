@@ -56,6 +56,7 @@ set(SOURCE_FILES
   ${lsd_SOURCE_FILES}
   ${PROJECT_SOURCE_DIR}/IOWrapper/OpenCV/ImageDisplay_OpenCV.cpp
   ${PROJECT_SOURCE_DIR}/IOWrapper/Pangolin/PangolinOutput3DWrapper.cpp
+  ${PROJECT_SOURCE_DIR}/IOWrapper/DataOutput/DataOutput3DWrapper.cpp
 )
 
 include_directories(

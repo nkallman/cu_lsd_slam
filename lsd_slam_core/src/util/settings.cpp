@@ -32,7 +32,7 @@ int debugDisplay = 0;
 
 bool onSceenInfoDisplay = true;
 bool displayDepthMap = true;
-bool dumpMap = true;
+bool dumpMap = false;
 bool doFullReConstraintTrack = false;
 
 // dyn config

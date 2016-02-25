@@ -26,6 +26,7 @@
 #include "util/globalFuncs.h"
 #include "util/ThreadMutexObject.h"
 #include "IOWrapper/Pangolin/PangolinOutput3DWrapper.h"
+#include "IOWrapper/DataOutput/DataOutput3DWrapper.h"
 #include "SlamSystem.h"
 #include "util/ImageSource.h"
 
@@ -244,7 +245,8 @@ int main(int argc, char** argv) {
 
 	gui.initImages();
 
-	Output3DWrapper* outputWrapper = new PangolinOutput3DWrapper(w, h, gui);
+//	Output3DWrapper* outputWrapper = new PangolinOutput3DWrapper(w, h, gui);
+	Output3DWrapper* outputWrapper = new DataOutput3DWrapper(w, h, gui);
 
 	// make slam system
 	SlamSystem * system = new SlamSystem(w, h, K, doSlam);
