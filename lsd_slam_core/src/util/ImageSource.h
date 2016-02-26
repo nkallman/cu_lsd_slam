@@ -11,25 +11,25 @@
 #include <string>
 #include "RawLogReader.h"
 
-namespace lsd {
-
 class ImageSource {
 public:
-	virtual ~ImageSource() {};
-	virtual ImageSource();
-	virtual bool IsAtEnd() = 0;
-	virtual cv::Mat GetNextImage() = 0;
+	~ImageSource() {
+	}
+	;
+	ImageSource();
+	bool IsAtEnd();
+	cv::Mat GetNextImage();
 	void SetWidthAndHeight(int width, int height);
 
-private:
+protected:
 	int h;
 	int w;
 	unsigned int index;
 };
 
-class LogReaderImageSource : public ImageSource {
+class LogReaderImageSource: public ImageSource {
 public:
-	LogReaderImageSource(const LogReader &lr);
+	LogReaderImageSource(RawLogReader &lr);
 	bool IsAtEnd();
 	cv::Mat GetNextImage();
 
@@ -37,7 +37,7 @@ private:
 	RawLogReader *logReader;
 };
 
-class FileListImageSource : public ImageSource {
+class FileListImageSource: public ImageSource {
 public:
 	FileListImageSource(std::vector<std::string> fileList);
 	bool IsAtEnd();
@@ -47,7 +47,7 @@ private:
 	std::vector<std::string> files;
 };
 
-class CameraImageSource : public ImageSource {
+class CameraImageSource: public ImageSource {
 public:
 	CameraImageSource(int cameraIndex);
 	bool IsAtEnd();
@@ -56,7 +56,5 @@ public:
 private:
 	cv::VideoCapture camera;
 };
-
-} /* namespace lsd */
 
 #endif /* UTILITIES_IMAGESOURCE_H_ */

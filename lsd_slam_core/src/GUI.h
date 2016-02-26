@@ -18,54 +18,52 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "util/Resolution.h"
 #include "util/Intrinsics.h"
-#include "IOWrapper/Pangolin/Keyframe.h"
+#include "IOWrapper/DataOutput/Keyframe.h"
 #include "util/ThreadMutexObject.h"
 #include "DataStructures/Frame.h"
 
 #define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
 
-class GUI
-{
-    public:
-        GUI();
+class GUI {
+public:
+	GUI();
 
-        virtual ~GUI();
+	virtual ~GUI();
 
-        void initImages();
+	void initImages();
 
-        void preCall();
+	void preCall();
 
-        void drawFrustum();
+	void drawFrustum();
 
-        void postCall();
+	void postCall();
 
-        void addKeyframe(Keyframe * newFrame);
+	void addKeyframe(Keyframe * newFrame);
 
-        void updateImage(unsigned char * data);
+	void updateImage(unsigned char * data);
 
-        void updateKeyframePoses(GraphFramePose* framePoseData, int num);
+	void updateKeyframePoses(GraphFramePose* framePoseData, int num);
 
-        void drawKeyframes();
+	void drawKeyframes();
 
-        void drawImages();
+	void drawImages();
 
-        ThreadMutexObject<Sophus::Sim3f> pose;
+	ThreadMutexObject<Sophus::Sim3f> pose;
 
-    private:
-        void drawGrid();
+private:
+	void drawGrid();
 
-        pangolin::GlTexture * depthImg;
+	pangolin::GlTexture * depthImg;
 
-        ThreadMutexObject<unsigned char * > depthImgBuffer;
+	ThreadMutexObject<unsigned char *> depthImgBuffer;
 
-        pangolin::Var<int> * gpuMem;
+	pangolin::Var<int> * gpuMem;
 
-        pangolin::Var<std::string> * totalPoints;
+	pangolin::Var<std::string> * totalPoints;
 
-        pangolin::OpenGlRenderState s_cam;
+	pangolin::OpenGlRenderState s_cam;
 
-        ThreadMutexObject<std::map<int, Keyframe *> > keyframes;
+	ThreadMutexObject<std::map<int, Keyframe *> > keyframes;
 };
-
 
 #endif /* GUI_H_ */

@@ -42,6 +42,7 @@ set(lsd_SOURCE_FILES
   ${PROJECT_SOURCE_DIR}/util/settings.cpp
   ${PROJECT_SOURCE_DIR}/util/Undistorter.cpp
   ${PROJECT_SOURCE_DIR}/util/RawLogReader.cpp
+  ${PROJECT_SOURCE_DIR}/util/ImageSource.cpp
   ${PROJECT_SOURCE_DIR}/Tracking/Sim3Tracker.cpp
   ${PROJECT_SOURCE_DIR}/Tracking/Relocalizer.cpp
   ${PROJECT_SOURCE_DIR}/Tracking/SE3Tracker.cpp

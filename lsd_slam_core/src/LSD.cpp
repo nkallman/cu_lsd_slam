@@ -43,7 +43,7 @@
 #include "GUI.h"
 
 // TREVOR: IMAGE SOURCE VARIABLE
-ImageSource imageSource;
+ImageSource *imageSource;
 
 std::vector<std::string> files;
 int w, h, w_inp, h_inp;
@@ -147,12 +147,13 @@ void run(SlamSystem * system, Undistorter* undistorter,
 	// TREVOR: change for loop to while so it runs until image source has gone to end
 	// goes on infinitely for cameras
 	//for (unsigned int i = 0; i < numFrames; i++) {
-	while(!imageSource.IsEndOf()) {
+	int i = 0;
+	while (!imageSource->IsAtEnd()) {
 		if (lsdDone.getValue())
 			break;
 
 		cv::Mat imageDist = cv::Mat(h, w, CV_8U);
-		imageDist = imageSource.GetNextImage();
+		imageDist = imageSource->GetNextImage();
 
 		if (logReader) {
 			logReader->getNext();
@@ -176,7 +177,7 @@ void run(SlamSystem * system, Undistorter* undistorter,
 			}
 		}
 
-		if(imageDist.empty()) {
+		if (imageDist.empty()) {
 			continue;
 		}
 
@@ -207,6 +208,7 @@ void run(SlamSystem * system, Undistorter* undistorter,
 			fullResetRequested = false;
 			runningIDX = 0;
 		}
+		i++;
 	}
 
 	lsdDone.assignValue(true);
@@ -261,12 +263,12 @@ int main(int argc, char** argv) {
 //		printf("need source files! (set using -f FOLDER or KLG)\n");
 //		exit(0);
 
-		CameraImageSource camSource();
-		imageSource = camSource;
+		imageSource = new CameraImageSource(0);
 	} else {
 		// TREVOR: if has filename, decide whether to make logreader or files source
 
-		Bytef * decompressionBuffer = new Bytef[Resolution::getInstance().numPixels() * 2];
+		Bytef * decompressionBuffer =
+				new Bytef[Resolution::getInstance().numPixels() * 2];
 		IplImage * deCompImage = 0;
 
 		if (source.substr(source.find_last_of(".") + 1) == "klg") {
@@ -276,8 +278,7 @@ int main(int argc, char** argv) {
 			numFrames = logReader->getNumFrames();
 
 			// TREVOR: imageSource is based on LogReader
-			LogReaderImageSource lrSource(logReader);
-			imageSource = lrSource;
+			imageSource = new LogReaderImageSource(*logReader);
 		} else {
 			if (getdir(source, files) >= 0) {
 				printf("found %d image files in folder %s!\n",
@@ -292,8 +293,7 @@ int main(int argc, char** argv) {
 			numFrames = (int) files.size();
 
 			// TREVOR: imageSource is based on list of files
-			FileListImageSource flSource(files);
-			imageSource = flSource;
+			imageSource = new FileListImageSource(files);
 		}
 	}
 
@@ -322,5 +322,6 @@ int main(int argc, char** argv) {
 	delete system;
 	delete undistorter;
 	delete outputWrapper;
+	delete imageSource;
 	return 0;
 }

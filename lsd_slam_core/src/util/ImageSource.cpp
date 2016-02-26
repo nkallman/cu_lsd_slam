@@ -7,13 +7,21 @@
 
 #include "ImageSource.h"
 
-namespace lsd {
 // ImageSource Interface Methods
 
 ImageSource::ImageSource() {
 	w = 0;
 	h = 0;
 	index = 0;
+}
+
+bool ImageSource::IsAtEnd() {
+	return false;
+}
+
+cv::Mat ImageSource::GetNextImage() {
+	cv::Mat r;
+	return r;
 }
 
 void ImageSource::SetWidthAndHeight(int width, int height) {
@@ -23,9 +31,10 @@ void ImageSource::SetWidthAndHeight(int width, int height) {
 
 // CameraImageSource Implementation
 
-CameraImageSource::CameraImageSource(int cameraIndex) : ImageSource() {
+CameraImageSource::CameraImageSource(int cameraIndex) :
+		ImageSource() {
 	camera = cv::VideoCapture(cameraIndex);
-	if(!camera.isOpened()) {
+	if (!camera.isOpened()) {
 		printf("Error: Could not find camera at index %d", cameraIndex);
 	}
 }
@@ -46,7 +55,8 @@ cv::Mat CameraImageSource::GetNextImage() {
 		if (imageDist.rows * imageDist.cols == 0) {
 			printf("failed to take image.\n");
 		} else {
-			printf("image has wrong dimensions - expecting %d x %d, found %d x %d. Skipping.\n",
+			printf(
+					"image has wrong dimensions - expecting %d x %d, found %d x %d. Skipping.\n",
 					w, h, imageDist.cols, imageDist.rows);
 		}
 	}
@@ -58,8 +68,9 @@ cv::Mat CameraImageSource::GetNextImage() {
 
 // LogReaderImageSource Implementation
 
-LogReaderImageSource::LogReaderImageSource(const LogReader &lr) : ImageSource() {
-	logReader = lr;
+LogReaderImageSource::LogReaderImageSource(RawLogReader &lr) :
+		ImageSource() {
+	logReader = &lr;
 }
 
 bool LogReaderImageSource::IsAtEnd() {
@@ -69,7 +80,7 @@ bool LogReaderImageSource::IsAtEnd() {
 cv::Mat LogReaderImageSource::GetNextImage() {
 	cv::Mat imageDist;
 
-	if(IsAtEnd()) {
+	if (IsAtEnd()) {
 		return imageDist;
 	}
 
@@ -86,7 +97,8 @@ cv::Mat LogReaderImageSource::GetNextImage() {
 
 // FileListImageSource Implementation
 
-FileListImageSource::FileListImageSource(std::vector<std::string> fileList) : ImageSource() {
+FileListImageSource::FileListImageSource(std::vector<std::string> fileList) :
+		ImageSource() {
 	files = fileList;
 	index = 0;
 }
@@ -98,7 +110,7 @@ bool FileListImageSource::IsAtEnd() {
 cv::Mat FileListImageSource::GetNextImage() {
 	cv::Mat imageDist;
 
-	if(IsAtEnd()) {
+	if (IsAtEnd()) {
 		return imageDist;
 	}
 
@@ -106,12 +118,13 @@ cv::Mat FileListImageSource::GetNextImage() {
 
 	if (imageDist.rows != h || imageDist.cols != w) {
 		if (imageDist.rows * imageDist.cols == 0) {
-			printf("failed to load image %s! skipping.\n", files[index].c_str());
+			printf("failed to load image %s! skipping.\n",
+					files[index].c_str());
 		} else {
-			printf("image %s has wrong dimensions - expecting %d x %d, found %d x %d. Skipping.\n",
-				files[index].c_str(), w, h, imageDist.cols, imageDist.rows);
+			printf(
+					"image %s has wrong dimensions - expecting %d x %d, found %d x %d. Skipping.\n",
+					files[index].c_str(), w, h, imageDist.cols, imageDist.rows);
 		}
 	}
 }
 
-} /* namespace lsd */
