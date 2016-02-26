@@ -59,25 +59,25 @@ void DataOutput3DWrapper::publishKeyframe(Frame* f) {
 	const float* idepthVar = f->idepthVar(publishLvl);
 	const float* color = f->image(publishLvl);
 
-	std::cout << "Publishing Keyframe\n";
-	std::cout << "KeyframeDepth ";
-	std::cout << "id:" << fMsg->id << " ";
-	std::cout << "fx:" << fMsg->fx << " ";
-	std::cout << "fy:" << fMsg->fy << " ";
-	std::cout << "cx:" << fMsg->cx << " ";
-	std::cout << "cy:" << fMsg->cy << " ";
-	std::cout << "w:" << fMsg->width << " ";
-	std::cout << "h:" << fMsg->height << " ";
+//	std::cout << "Publishing Keyframe\n";
+//	std::cout << "KeyframeDepth ";
+//	std::cout << "id:" << fMsg->id << " ";
+//	std::cout << "fx:" << fMsg->fx << " ";
+//	std::cout << "fy:" << fMsg->fy << " ";
+//	std::cout << "cx:" << fMsg->cx << " ";
+//	std::cout << "cy:" << fMsg->cy << " ";
+//	std::cout << "w:" << fMsg->width << " ";
+//	std::cout << "h:" << fMsg->height << " ";
 	for (int idx = 0; idx < w * h; idx++) {
 		pc[idx].idepth = idepth[idx];
-		std::cout << "idepth[" << idx << "]:" << pc[idx].idepth << " ";
+//		std::cout << "idepth[" << idx << "]:" << pc[idx].idepth << " ";
 		pc[idx].idepth_var = idepthVar[idx];
 		pc[idx].color[0] = color[idx];
 		pc[idx].color[1] = color[idx];
 		pc[idx].color[2] = color[idx];
 		pc[idx].color[3] = color[idx];
 	}
-	std::cout << std::endl;
+//	std::cout << std::endl;
 
 	lock.unlock();
 
@@ -139,7 +139,7 @@ void DataOutput3DWrapper::publishKeyframeGraph(KeyFrameGraph* graph) {
 	unsigned char * buffer = new unsigned char[num * sizeof(GraphFramePose)];
 
 	GraphFramePose* framePoseData = (GraphFramePose*) buffer;
-	std::cout << "Publishing Keyframe Graph\n";
+//	std::cout << "Publishing Keyframe Graph\n";
 
 	for (unsigned int i = 0; i < graph->keyframesAll.size(); i++) {
 		framePoseData[i].id = graph->keyframesAll[i]->id();
