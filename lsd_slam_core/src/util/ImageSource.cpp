@@ -48,8 +48,6 @@ cv::Mat CameraImageSource::GetNextImage() {
 	cv::Mat imageDist;
 	cv::Mat initImage;
 
-//	std::cerr << "GetNextImage\n\n";
-
 	camera >> initImage;
 
 	cv::cvtColor(initImage, imageDist, CV_RGB2GRAY);
@@ -131,3 +129,49 @@ cv::Mat FileListImageSource::GetNextImage() {
 	}
 }
 
+// CameraModuleImageSource Implementation
+CameraModuleImageSource::CameraModuleImageSource() :
+		ImageSource() {
+
+}
+
+bool CameraModuleImageSource::IsAtEnd() {
+	return imageQueue == null;
+}
+
+// Reads in next set of images and returns the left image from this new set.
+cv::Mat CameraModuleImageSource::GetNextImage() {
+	left = getGrayImage();
+
+	if(isStereo) {
+		right = getGrayImage();
+	}
+
+	return left;
+}
+
+// Gets the right image from last read. Does not read new set of images.
+cv::Mat CameraModuleImageSource::GetRight() {
+	return right;
+}
+
+// Gets the left image from the last read. Does not read new images.
+cv::Mat CameraModuleImageSource::GetLeft() {
+	return left;
+}
+
+bool CameraModuleImageSource::SetStereo(bool isStereoCam) {
+	isStereo = isStereoCam;
+}
+
+cv::Mat CameraModuleImageSource::getGrayImage() {
+	cv::Mat imageDist;
+
+	int i = 0;
+	while(!imageQueue.try_pop(imageDist) && i < 1000) {
+		i++;
+	}
+
+	cv::cvtColor(imageDist, imageDist, CV_RGB2GRAY);
+	return imageDist;
+}
