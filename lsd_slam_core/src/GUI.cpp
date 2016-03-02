@@ -344,3 +344,25 @@ void GUI::postCall() {
 
 	glFinish();
 }
+
+void GUI::savePLY(std::string filename) {
+	boost::mutex::scoped_lock lock(keyframes.getMutex());
+
+	std::string pts = "";
+
+	for (std::map<int, Keyframe *>::iterator i =
+			keyframes.getReference().begin();
+			i != keyframes.getReference().end(); ++i) {
+		//Don't render first five, according to original code
+		if (i->second->initId >= 5) {
+			if (!i->second->hasVbo || i->second->needsUpdate) {
+				i->second->computeVbo();
+			}
+
+			Sophus::Matrix4f m = i->second->camToWorld.matrix();
+
+		}
+	}
+
+	lock.unlock();
+}

@@ -154,14 +154,13 @@ void run(SlamSystem * system, Undistorter* undistorter,
 
 		cv::Mat imageDist = cv::Mat(h, w, CV_8U);
 		imageDist = imageSource->GetNextImage();
-
 		if (logReader) {
 			logReader->getNext();
 
 			cv::Mat3b img(h, w, (cv::Vec3b *) logReader->rgb);
 
 			cv::cvtColor(img, imageDist, CV_RGB2GRAY);
-		} else {
+		} else if (files.size() != 0) {
 			imageDist = cv::imread(files[i], CV_LOAD_IMAGE_GRAYSCALE);
 
 			if (imageDist.rows != h_inp || imageDist.cols != w_inp) {
@@ -262,7 +261,6 @@ int main(int argc, char** argv) {
 	if (!(Parse::arg(argc, argv, "-f", source) > 0)) {
 //		printf("need source files! (set using -f FOLDER or KLG)\n");
 //		exit(0);
-
 		imageSource = new CameraImageSource(0);
 	} else {
 		// TREVOR: if has filename, decide whether to make logreader or files source
@@ -278,7 +276,7 @@ int main(int argc, char** argv) {
 			numFrames = logReader->getNumFrames();
 
 			// TREVOR: imageSource is based on LogReader
-			imageSource = new LogReaderImageSource(*logReader);
+			imageSource = new LogReaderImageSource(logReader);
 		} else {
 			if (getdir(source, files) >= 0) {
 				printf("found %d image files in folder %s!\n",
@@ -296,6 +294,8 @@ int main(int argc, char** argv) {
 			imageSource = new FileListImageSource(files);
 		}
 	}
+
+	imageSource->SetWidthAndHeight(w, h);
 
 	boost::thread lsdThread(run, system, undistorter, outputWrapper, K);
 

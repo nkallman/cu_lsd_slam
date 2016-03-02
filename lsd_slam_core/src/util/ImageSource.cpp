@@ -15,14 +15,14 @@ ImageSource::ImageSource() {
 	index = 0;
 }
 
-bool ImageSource::IsAtEnd() {
-	return false;
-}
-
-cv::Mat ImageSource::GetNextImage() {
-	cv::Mat r;
-	return r;
-}
+//bool ImageSource::IsAtEnd() {
+//	return false;
+//}
+//
+//cv::Mat ImageSource::GetNextImage() {
+//	cv::Mat r;
+//	return r;
+//}
 
 void ImageSource::SetWidthAndHeight(int width, int height) {
 	w = width;
@@ -34,6 +34,7 @@ void ImageSource::SetWidthAndHeight(int width, int height) {
 CameraImageSource::CameraImageSource(int cameraIndex) :
 		ImageSource() {
 	camera = cv::VideoCapture(cameraIndex);
+
 	if (!camera.isOpened()) {
 		printf("Error: Could not find camera at index %d", cameraIndex);
 	}
@@ -46,6 +47,8 @@ bool CameraImageSource::IsAtEnd() {
 cv::Mat CameraImageSource::GetNextImage() {
 	cv::Mat imageDist;
 	cv::Mat initImage;
+
+//	std::cerr << "GetNextImage\n\n";
 
 	camera >> initImage;
 
@@ -68,9 +71,9 @@ cv::Mat CameraImageSource::GetNextImage() {
 
 // LogReaderImageSource Implementation
 
-LogReaderImageSource::LogReaderImageSource(RawLogReader &lr) :
+LogReaderImageSource::LogReaderImageSource(RawLogReader *lr) :
 		ImageSource() {
-	logReader = &lr;
+	logReader = lr;
 }
 
 bool LogReaderImageSource::IsAtEnd() {
@@ -92,7 +95,7 @@ cv::Mat LogReaderImageSource::GetNextImage() {
 
 	index++;
 
-	return imageDist;
+	return img;
 }
 
 // FileListImageSource Implementation

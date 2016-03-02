@@ -17,8 +17,8 @@ public:
 	}
 	;
 	ImageSource();
-	bool IsAtEnd();
-	cv::Mat GetNextImage();
+	virtual bool IsAtEnd() = 0;
+	virtual cv::Mat GetNextImage() = 0;
 	void SetWidthAndHeight(int width, int height);
 
 protected:
@@ -29,7 +29,7 @@ protected:
 
 class LogReaderImageSource: public ImageSource {
 public:
-	LogReaderImageSource(RawLogReader &lr);
+	LogReaderImageSource(RawLogReader *lr);
 	bool IsAtEnd();
 	cv::Mat GetNextImage();
 

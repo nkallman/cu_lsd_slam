@@ -48,6 +48,8 @@ public:
 
 	void drawImages();
 
+	void savePLY(std::string filename);
+
 	ThreadMutexObject<Sophus::Sim3f> pose;
 
 private:
