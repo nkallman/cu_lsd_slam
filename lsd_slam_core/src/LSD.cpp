@@ -25,7 +25,7 @@
 #include "util/Parse.h"
 #include "util/globalFuncs.h"
 #include "util/ThreadMutexObject.h"
-#include "IOWrapper/Pangolin/PangolinOutput3DWrapper.h"
+//#include "IOWrapper/Pangolin/PangolinOutput3DWrapper.h"
 #include "IOWrapper/DataOutput/DataOutput3DWrapper.h"
 #include "SlamSystem.h"
 #include "util/ImageSource.h"
@@ -151,9 +151,13 @@ void run(SlamSystem * system, Undistorter* undistorter,
 	while (!imageSource->IsAtEnd()) {
 		if (lsdDone.getValue())
 			break;
-
+		int tp = 0;
+		std::cout << "Test Pt" << ++tp << std::endl;
+		// SEGFAULT
 		cv::Mat imageDist = cv::Mat(h, w, CV_8U);
 		imageDist = imageSource->GetNextImage();
+		std::cout << "Test Pt" << ++tp << std::endl;
+		// SEGFAULT
 		if (logReader) {
 			logReader->getNext();
 
@@ -175,27 +179,33 @@ void run(SlamSystem * system, Undistorter* undistorter,
 				continue;
 			}
 		}
+		std::cout << "Test Pt" << ++tp << std::endl;
 
 		if (imageDist.empty()) {
 			continue;
 		}
+		std::cout << "Test Pt" << ++tp << std::endl;
 
 		assert(imageDist.type() == CV_8U);
+		std::cout << "Test Pt" << ++tp << std::endl;
 
 		undistorter->undistort(imageDist, image);
+		std::cout << "Test Pt" << ++tp << std::endl;
 
 		assert(image.type() == CV_8U);
+		std::cout << "Test Pt" << ++tp << std::endl;
 
 		if (runningIDX == 0) {
 			system->randomInit(image.data, fakeTimeStamp, runningIDX);
 		} else {
 			system->trackFrame(image.data, runningIDX, hz == 0, fakeTimeStamp);
 		}
-
+		std::cout << "Assigning Pose\n";
 		gui.pose.assignValue(system->getCurrentPoseEstimateScale());
-
+		std::cout << "Pose Assigned\n";
 		runningIDX++;
 		fakeTimeStamp += 0.03;
+		std::cout << "Test Pt" << ++tp << std::endl;
 
 		if (fullResetRequested) {
 			printf("FULL RESET!\n");
@@ -244,7 +254,7 @@ int main(int argc, char** argv) {
 	Resolution::getInstance(w, h);
 	Intrinsics::getInstance(fx, fy, cx, cy);
 
-	gui.initImages();
+//	gui.initImages();
 
 //	Output3DWrapper* outputWrapper = new PangolinOutput3DWrapper(w, h, gui);
 	Output3DWrapper* outputWrapper = new DataOutput3DWrapper(w, h, gui);
@@ -287,7 +297,6 @@ int main(int argc, char** argv) {
 			} else {
 				printf("could not load file list! wrong path / file?\n");
 			}
-
 			numFrames = (int) files.size();
 
 			// TREVOR: imageSource is based on list of files
@@ -299,20 +308,22 @@ int main(int argc, char** argv) {
 
 	boost::thread lsdThread(run, system, undistorter, outputWrapper, K);
 
-	while (!pangolin::ShouldQuit()) {
+	while (!lsdDone.getValue()/*pangolin::ShouldQuit()*/) {
 		if (lsdDone.getValue() && !system->finalized) {
 			system->finalize();
 		}
 
-		gui.preCall();
+//		gui.preCall();
+//
+//		gui.drawKeyframes();
+//
+//		gui.drawFrustum();
+//
+//		gui.drawImages();
+//
+//		gui.postCall();
 
-		gui.drawKeyframes();
-
-		gui.drawFrustum();
-
-		gui.drawImages();
-
-		gui.postCall();
+		gui.savePLY("test.ply");
 	}
 
 	lsdDone.assignValue(true);

@@ -36,6 +36,7 @@ public:
 
 		if (hasVbo)
 			glDeleteBuffers(1, &vbo);
+		delete vboDat;
 	}
 
 	struct MyVertex {
@@ -134,6 +135,12 @@ public:
 			}
 		}
 
+		if (needsUpdate) {
+			delete vboDat;
+		}
+		vboDat = new MyVertex[width * height];
+		std::copy(tmpBuffer, tmpBuffer + points, vboDat);
+
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(MyVertex) * points, tmpBuffer,
@@ -224,6 +231,7 @@ public:
 
 	bool hasVbo;
 	GLuint vbo;
+	MyVertex * vboDat;
 	int points;
 	bool needsUpdate;
 };

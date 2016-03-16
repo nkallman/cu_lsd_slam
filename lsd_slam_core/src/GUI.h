@@ -55,17 +55,19 @@ public:
 private:
 	void drawGrid();
 
-	pangolin::GlTexture * depthImg;
+//	pangolin::GlTexture * depthImg;
+//
+//	ThreadMutexObject<unsigned char *> depthImgBuffer;
+//
+//	pangolin::Var<int> * gpuMem;
+//
+//	pangolin::Var<std::string> * totalPoints;
 
-	ThreadMutexObject<unsigned char *> depthImgBuffer;
-
-	pangolin::Var<int> * gpuMem;
-
-	pangolin::Var<std::string> * totalPoints;
-
-	pangolin::OpenGlRenderState s_cam;
+//	pangolin::OpenGlRenderState s_cam;
 
 	ThreadMutexObject<std::map<int, Keyframe *> > keyframes;
+
+	int prevPoints;
 };
 
 #endif /* GUI_H_ */
