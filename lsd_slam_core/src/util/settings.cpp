@@ -31,7 +31,7 @@ bool autoRunWithinFrame = true;
 int debugDisplay = 0;
 
 bool onSceenInfoDisplay = true;
-bool displayDepthMap = true;
+bool displayDepthMap = false;
 bool dumpMap = false;
 bool doFullReConstraintTrack = false;
 

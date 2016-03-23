@@ -308,7 +308,7 @@ int main(int argc, char** argv) {
 
 	boost::thread lsdThread(run, system, undistorter, outputWrapper, K);
 
-	while (!lsdDone.getValue()/*pangolin::ShouldQuit()*/) {
+	while (!lsdDone.getValue() && !system->finalized/*pangolin::ShouldQuit()*/) {
 		if (lsdDone.getValue() && !system->finalized) {
 			system->finalize();
 		}
@@ -323,7 +323,7 @@ int main(int argc, char** argv) {
 //
 //		gui.postCall();
 
-		gui.savePLY("test.ply");
+//		gui.savePLY("test.ply");
 	}
 
 	lsdDone.assignValue(true);

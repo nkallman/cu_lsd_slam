@@ -968,15 +968,20 @@ float SE3Tracker::calcResidualAndBuffers(const Eigen::Vector3f* refPoint,
 		*(buf_d + idx) = 1.0f / (*refPoint)[2];
 		*(buf_idepthVar + idx) = (*refColVar)[1];
 		idx++;
-
+		std::cout << "loop refPoint " << refPoint << std::endl;
 		if (isGood) {
+			std::cout << "residual:" << residual << std::endl;
+			// SEGFAULT??????
 			sumResUnweighted += residual * residual;
 			sumSignedRes += residual;
 			goodCount++;
 		} else
 			badCount++;
 
+		std::cout << "GC " << goodCount << " : BC " << badCount << std::endl;
+		// SEGFAULT??
 		float depthChange = (*refPoint)[2] / Wxp[2];// if depth becomes larger: pixel becomes "smaller", hence count it less.
+		std::cout << "depthchange " << depthChange << std::endl;
 		usageCount += depthChange < 1 ? depthChange : 1;
 
 		// DEBUG STUFF
@@ -1004,7 +1009,7 @@ float SE3Tracker::calcResidualAndBuffers(const Eigen::Vector3f* refPoint,
 
 		}
 	}
-
+	std::cout << "fin for loop\n";
 	buf_warped_size = idx;
 
 	pointUsage = usageCount / (float) refNum;
