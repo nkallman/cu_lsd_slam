@@ -8,7 +8,7 @@
 #ifndef KEYFRAME_H_
 #define KEYFRAME_H_
 
-#include <GL/glew.h>
+//#include <GL/glew.h>
 #include "util/settings.h"
 #include "sophus/sim3.hpp"
 #include <iostream>
@@ -35,8 +35,8 @@ public:
 			delete[] pointData;
 
 		if (hasVbo)
-			glDeleteBuffers(1, &vbo);
-		delete vboDat;
+//			glDeleteBuffers(1, &vbo);
+			delete[] vboDat;
 	}
 
 	struct MyVertex {
@@ -60,7 +60,7 @@ public:
 		assert(!(hasVbo && !needsUpdate));
 
 		if (hasVbo && needsUpdate) {
-			glDeleteBuffers(1, &vbo);
+//			glDeleteBuffers(1, &vbo);
 			points = 0;
 		}
 
@@ -136,15 +136,15 @@ public:
 		}
 
 		if (needsUpdate) {
-			delete vboDat;
+			delete[] vboDat;
 		}
 		vboDat = new MyVertex[width * height];
 		std::copy(tmpBuffer, tmpBuffer + points, vboDat);
 
-		glGenBuffers(1, &vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(MyVertex) * points, tmpBuffer,
-				GL_STATIC_DRAW);
+//		glGenBuffers(1, &vbo);
+//		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+//		glBufferData(GL_ARRAY_BUFFER, sizeof(MyVertex) * points, tmpBuffer,
+//				GL_STATIC_DRAW);
 
 		delete[] tmpBuffer;
 
@@ -158,59 +158,59 @@ public:
 	}
 
 	void drawPoints() {
-		assert(hasVbo);
-
-		glPushMatrix();
-
-		Sophus::Matrix4f m = camToWorld.matrix();
-		glMultMatrixf((GLfloat*) m.data());
-
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glVertexPointer(3, GL_FLOAT, sizeof(MyVertex), 0);
-		glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(MyVertex),
-				(const void*) (3 * sizeof(float)));
-
-		glEnableClientState (GL_VERTEX_ARRAY);
-		glEnableClientState (GL_COLOR_ARRAY);
-
-		glDrawArrays(GL_POINTS, 0, points);
-
-		glDisableClientState(GL_COLOR_ARRAY);
-		glDisableClientState(GL_VERTEX_ARRAY);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		glPopMatrix();
+//		assert(hasVbo);
+//
+//		glPushMatrix();
+//
+//		Sophus::Matrix4f m = camToWorld.matrix();
+//		glMultMatrixf((GLfloat*) m.data());
+//
+//		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+//		glVertexPointer(3, GL_FLOAT, sizeof(MyVertex), 0);
+//		glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(MyVertex),
+//				(const void*) (3 * sizeof(float)));
+//
+//		glEnableClientState (GL_VERTEX_ARRAY);
+//		glEnableClientState (GL_COLOR_ARRAY);
+//
+//		glDrawArrays(GL_POINTS, 0, points);
+//
+//		glDisableClientState(GL_COLOR_ARRAY);
+//		glDisableClientState(GL_VERTEX_ARRAY);
+//
+//		glBindBuffer(GL_ARRAY_BUFFER, 0);
+//
+//		glPopMatrix();
 	}
 
 	void drawCamera() {
-		glPushMatrix();
-		Sophus::Matrix4f m = camToWorld.matrix();
-		glMultMatrixf((GLfloat*) m.data());
-		glColor3f(1, 0, 0);
-		glBegin (GL_LINES);
-		glVertex3f(0, 0, 0);
-		glVertex3f(0.05 * (0 - cx) / fx, 0.05 * (0 - cy) / fy, 0.05);
-		glVertex3f(0, 0, 0);
-		glVertex3f(0.05 * (0 - cx) / fx, 0.05 * (height - 1 - cy) / fy, 0.05);
-		glVertex3f(0, 0, 0);
-		glVertex3f(0.05 * (width - 1 - cx) / fx, 0.05 * (height - 1 - cy) / fy,
-				0.05);
-		glVertex3f(0, 0, 0);
-		glVertex3f(0.05 * (width - 1 - cx) / fx, 0.05 * (0 - cy) / fy, 0.05);
-		glVertex3f(0.05 * (width - 1 - cx) / fx, 0.05 * (0 - cy) / fy, 0.05);
-		glVertex3f(0.05 * (width - 1 - cx) / fx, 0.05 * (height - 1 - cy) / fy,
-				0.05);
-		glVertex3f(0.05 * (width - 1 - cx) / fx, 0.05 * (height - 1 - cy) / fy,
-				0.05);
-		glVertex3f(0.05 * (0 - cx) / fx, 0.05 * (height - 1 - cy) / fy, 0.05);
-		glVertex3f(0.05 * (0 - cx) / fx, 0.05 * (height - 1 - cy) / fy, 0.05);
-		glVertex3f(0.05 * (0 - cx) / fx, 0.05 * (0 - cy) / fy, 0.05);
-		glVertex3f(0.05 * (0 - cx) / fx, 0.05 * (0 - cy) / fy, 0.05);
-		glVertex3f(0.05 * (width - 1 - cx) / fx, 0.05 * (0 - cy) / fy, 0.05);
-		glEnd();
-		glPopMatrix();
-		glColor3f(1, 1, 1);
+//		glPushMatrix();
+//		Sophus::Matrix4f m = camToWorld.matrix();
+//		glMultMatrixf((GLfloat*) m.data());
+//		glColor3f(1, 0, 0);
+//		glBegin (GL_LINES);
+//		glVertex3f(0, 0, 0);
+//		glVertex3f(0.05 * (0 - cx) / fx, 0.05 * (0 - cy) / fy, 0.05);
+//		glVertex3f(0, 0, 0);
+//		glVertex3f(0.05 * (0 - cx) / fx, 0.05 * (height - 1 - cy) / fy, 0.05);
+//		glVertex3f(0, 0, 0);
+//		glVertex3f(0.05 * (width - 1 - cx) / fx, 0.05 * (height - 1 - cy) / fy,
+//				0.05);
+//		glVertex3f(0, 0, 0);
+//		glVertex3f(0.05 * (width - 1 - cx) / fx, 0.05 * (0 - cy) / fy, 0.05);
+//		glVertex3f(0.05 * (width - 1 - cx) / fx, 0.05 * (0 - cy) / fy, 0.05);
+//		glVertex3f(0.05 * (width - 1 - cx) / fx, 0.05 * (height - 1 - cy) / fy,
+//				0.05);
+//		glVertex3f(0.05 * (width - 1 - cx) / fx, 0.05 * (height - 1 - cy) / fy,
+//				0.05);
+//		glVertex3f(0.05 * (0 - cx) / fx, 0.05 * (height - 1 - cy) / fy, 0.05);
+//		glVertex3f(0.05 * (0 - cx) / fx, 0.05 * (height - 1 - cy) / fy, 0.05);
+//		glVertex3f(0.05 * (0 - cx) / fx, 0.05 * (0 - cy) / fy, 0.05);
+//		glVertex3f(0.05 * (0 - cx) / fx, 0.05 * (0 - cy) / fy, 0.05);
+//		glVertex3f(0.05 * (width - 1 - cx) / fx, 0.05 * (0 - cy) / fy, 0.05);
+//		glEnd();
+//		glPopMatrix();
+//		glColor3f(1, 1, 1);
 	}
 
 	int id;
@@ -230,7 +230,7 @@ public:
 	unsigned char * pointData;
 
 	bool hasVbo;
-	GLuint vbo;
+//	GLuint vbo;
 	MyVertex * vboDat;
 	int points;
 	bool needsUpdate;

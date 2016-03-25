@@ -11,11 +11,11 @@
 #define GLM_FORCE_RADIANS
 
 #include <pangolin/pangolin.h>
-#include <pangolin/gl/gl.h>
-#include <pangolin/gl/gldraw.h>
-#include <map>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
+//#include <pangolin/gl/gl.h>
+//#include <pangolin/gl/gldraw.h>
+//#include <map>
+//#include <glm/glm.hpp>
+//#include <glm/gtc/type_ptr.hpp>
 #include "util/Resolution.h"
 #include "util/Intrinsics.h"
 #include "IOWrapper/DataOutput/Keyframe.h"

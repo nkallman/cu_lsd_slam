@@ -323,7 +323,7 @@ int main(int argc, char** argv) {
 //
 //		gui.postCall();
 
-//		gui.savePLY("test.ply");
+		gui.savePLY("live.ply");
 	}
 
 	lsdDone.assignValue(true);
