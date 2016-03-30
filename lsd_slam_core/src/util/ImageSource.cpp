@@ -41,6 +41,7 @@ CameraImageSource::CameraImageSource(int cameraIndex) :
 }
 
 bool CameraImageSource::IsAtEnd() {
+	std::cout << "camera is at end?";
 	return false;
 }
 
@@ -107,6 +108,8 @@ FileListImageSource::FileListImageSource(std::vector<std::string> fileList) :
 }
 
 bool FileListImageSource::IsAtEnd() {
+	std::cout << "index = " << index << " - files.size = " << files.size()
+			<< std::endl;
 	return index == files.size() - 1;
 }
 
@@ -129,5 +132,9 @@ cv::Mat FileListImageSource::GetNextImage() {
 					files[index].c_str(), w, h, imageDist.cols, imageDist.rows);
 		}
 	}
+
+	index++;
+
+	return imageDist;
 }
 

@@ -347,6 +347,10 @@ void GUI::postCall() {
 //	glFinish();
 }
 
+void GUI::publish() {
+	// TODO: publish  the pointcloud on a Unix socket
+}
+
 void GUI::savePLY(std::string filename) {
 	boost::mutex::scoped_lock lock(keyframes.getMutex());
 

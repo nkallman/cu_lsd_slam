@@ -846,8 +846,6 @@ void SlamSystem::trackFrame(uchar* image, unsigned int frameID,
 	std::shared_ptr < Frame
 			> trackingNewFrame(
 					new Frame(frameID, width, height, K, timestamp, image));
-	int tp = 0;
-	std::cout << "Subtest Pt" << ++tp << std::endl;
 
 	if (!trackingIsGood) {
 		relocalizer.updateCurrentFrame(trackingNewFrame);
@@ -857,7 +855,6 @@ void SlamSystem::trackFrame(uchar* image, unsigned int frameID,
 		unmappedTrackedFramesMutex.unlock();
 		return;
 	}
-	std::cout << "Subtest Pt" << ++tp << std::endl;
 
 	currentKeyFrameMutex.lock();
 	bool my_createNewKeyframe = createNewKeyFrame;// pre-save here, to make decision afterwards.
@@ -867,11 +864,9 @@ void SlamSystem::trackFrame(uchar* image, unsigned int frameID,
 		currentKeyFrame->depthHasBeenUpdatedFlag = false;
 		trackingReferenceFrameSharedPT = currentKeyFrame;
 	}
-	std::cout << "Subtest Pt" << ++tp << std::endl;
 
 	FramePoseStruct* trackingReferencePose = trackingReference->keyframe->pose;
 	currentKeyFrameMutex.unlock();
-	std::cout << "Subtest Pt" << ++tp << std::endl;
 
 	// DO TRACKING & Show tracking result.
 	if (enablePrintDebugInfo && printThreadingInfo)
@@ -883,12 +878,10 @@ void SlamSystem::trackFrame(uchar* image, unsigned int frameID,
 			trackingReferencePose->getCamToWorld().inverse()
 					* keyFrameGraph->allFramePoses.back()->getCamToWorld());
 	poseConsistencyMutex.unlock_shared();
-	std::cout << "Subtest Pt" << ++tp << std::endl;
 
 	struct timeval tv_start, tv_end;
 	gettimeofday(&tv_start, NULL);
-	std::cout << "Subtest Pt" << ++tp << std::endl;
-	// SEGFAULT
+
 	SE3 newRefToFrame_poseUpdate = tracker->trackFrame(trackingReference,
 			trackingNewFrame.get(), frameToReference_initialEstimate);
 
@@ -899,7 +892,6 @@ void SlamSystem::trackFrame(uchar* image, unsigned int frameID,
 							+ (tv_end.tv_usec - tv_start.tv_usec) / 1000.0f);
 
 	nTrackFrame++;
-	std::cout << "Subtest Pt" << ++tp << std::endl;
 
 	tracking_lastResidual = tracker->lastResidual;
 	tracking_lastUsage = tracker->pointUsage;
@@ -908,7 +900,6 @@ void SlamSystem::trackFrame(uchar* image, unsigned int frameID,
 	tracking_lastGoodPerTotal = tracker->lastGoodCount
 			/ (trackingNewFrame->width(SE3TRACKING_MIN_LEVEL)
 					* trackingNewFrame->height(SE3TRACKING_MIN_LEVEL));
-	std::cout << "Subtest Pt" << ++tp << std::endl;
 
 	if (manualTrackingLossIndicated || tracker->diverged
 			|| (keyFrameGraph->keyframesAll.size() > INITIALIZATION_PHASE_COUNT
@@ -931,7 +922,6 @@ void SlamSystem::trackFrame(uchar* image, unsigned int frameID,
 		manualTrackingLossIndicated = false;
 		return;
 	}
-	std::cout << "Subtest Pt" << ++tp << std::endl;
 
 	if (plotTracking) {
 		Eigen::Matrix<float, 20, 1> data;
@@ -947,7 +937,6 @@ void SlamSystem::trackFrame(uchar* image, unsigned int frameID,
 		data[7] = tracker->affineEstimation_b;
 		outputWrapper->publishDebugInfo(data);
 	}
-	std::cout << "Subtest Pt" << ++tp << std::endl;
 
 	keyFrameGraph->addFrame(trackingNewFrame.get());
 
@@ -955,7 +944,6 @@ void SlamSystem::trackFrame(uchar* image, unsigned int frameID,
 	if (outputWrapper != 0) {
 		outputWrapper->publishTrackedFrame(trackingNewFrame.get());
 	}
-	std::cout << "Subtest Pt" << ++tp << std::endl;
 
 	// Keyframe selection
 	latestTrackedFrame = trackingNewFrame;
@@ -995,7 +983,6 @@ void SlamSystem::trackFrame(uchar* image, unsigned int frameID,
 
 		}
 	}
-	std::cout << "Subtest Pt" << ++tp << std::endl;
 
 	unmappedTrackedFramesMutex.lock();
 	if (unmappedTrackedFrames.size() < 50
@@ -1006,7 +993,6 @@ void SlamSystem::trackFrame(uchar* image, unsigned int frameID,
 	unmappedTrackedFramesSignal.notify_one();
 	unmappedTrackedFramesMutex.unlock();
 
-	std::cout << "Subtest Pt" << ++tp << std::endl;
 	// implement blocking
 	if (blockUntilMapped && trackingIsGood) {
 		boost::unique_lock < boost::mutex > lock(newFrameMappedMutex);

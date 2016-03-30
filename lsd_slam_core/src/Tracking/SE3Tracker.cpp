@@ -268,8 +268,6 @@ SE3 SE3Tracker::trackFrameOnPermaref(Frame* reference, Frame* frame,
 // first_frame has depth, second_frame DOES NOT have depth.
 SE3 SE3Tracker::trackFrame(TrackingReference* reference, Frame* frame,
 		const SE3& frameToReference_initialEstimate) {
-	int tp = 0;
-	std::cout << "Narrow Pt" << ++tp << std::endl;
 
 	boost::shared_lock < boost::shared_mutex > lock = frame->getActiveLock();
 	diverged = false;
@@ -277,14 +275,10 @@ SE3 SE3Tracker::trackFrame(TrackingReference* reference, Frame* frame,
 	affineEstimation_a = 1;
 	affineEstimation_b = 0;
 
-	std::cout << "Narrow Pt" << ++tp << std::endl;
-
 	if (saveAllTrackingStages) {
 		saveAllTrackingStages = false;
 		saveAllTrackingStagesInternal = true;
 	}
-
-	std::cout << "Narrow Pt" << ++tp << std::endl;
 
 	if (plotTrackingIterationInfo) {
 		const float* frameImage = frame->image();
@@ -295,8 +289,6 @@ SE3 SE3Tracker::trackFrame(TrackingReference* reference, Frame* frame,
 						1);
 	}
 
-	std::cout << "Narrow Pt" << ++tp << std::endl;
-
 	// ============ track frame ============
 	Sophus::SE3f referenceToFrame =
 			frameToReference_initialEstimate.inverse().cast<float>();
@@ -306,8 +298,6 @@ SE3 SE3Tracker::trackFrame(TrackingReference* reference, Frame* frame,
 	int numCalcWarpUpdateCalls[PYRAMID_LEVELS];
 
 	float last_residual = 0;
-
-	std::cout << "Narrow Pt" << ++tp << std::endl;
 
 	for (int lvl = SE3TRACKING_MAX_LEVEL - 1; lvl >= SE3TRACKING_MIN_LEVEL;
 			lvl--) {
@@ -337,12 +327,9 @@ SE3 SE3Tracker::trackFrame(TrackingReference* reference, Frame* frame,
 		numCalcResidualCalls[lvl]++;
 
 		float LM_lambda = settings.lambdaInitial[lvl];
-		std::cout << "lvl " << lvl << std::endl;
 
 		for (int iteration = 0; iteration < settings.maxItsPerLvl[lvl];
 				iteration++) {
-			// SEGFAULT ^
-			std::cout << "interation " << iteration << std::endl;
 
 			callOptimized(calculateWarpUpdate, (ls));
 
@@ -351,7 +338,6 @@ SE3 SE3Tracker::trackFrame(TrackingReference* reference, Frame* frame,
 			iterationNumber = iteration;
 
 			int incTry = 0;
-			std::cout << "interation " << iteration << std::endl;
 			while (true) {
 				int pp = 0;
 				// solve LS system with current lambda
@@ -362,18 +348,15 @@ SE3 SE3Tracker::trackFrame(TrackingReference* reference, Frame* frame,
 				Vector6 inc = A.ldlt().solve(b);
 				incTry++;
 
-				std::cout << "MPt" << ++pp << std::endl;
-				std::cout << "applying increment\n";
 				// apply increment. pretty sure this way round is correct, but hard to test.
 				Sophus::SE3f new_referenceToFrame = Sophus::SE3f::exp((inc))
 						* referenceToFrame;
 				//Sophus::SE3f new_referenceToFrame = referenceToFrame * Sophus::SE3f::exp((inc));
-				std::cout << "reevaluating residual\n";
-				// SEGFAULT
+
 				// re-evaluate residual
 				callOptimized(calcResidualAndBuffers,
 						(reference->posData[lvl], reference->colorAndVarData[lvl], SE3TRACKING_MIN_LEVEL == lvl ? reference->pointPosInXYGrid[lvl] : 0, reference->numData[lvl], frame, new_referenceToFrame, lvl, (plotTracking && lvl == SE3TRACKING_MIN_LEVEL)));
-				std::cout << "test for divergence\n";
+
 				if (buf_warped_size
 						< MIN_GOODPERALL_PIXEL_ABSMIN * (width >> lvl)
 								* (height >> lvl)) {
@@ -381,7 +364,6 @@ SE3 SE3Tracker::trackFrame(TrackingReference* reference, Frame* frame,
 					trackingWasGood = false;
 					return SE3();
 				}
-				std::cout << "MPt" << ++pp << std::endl;
 
 				float error = callOptimized(calcWeightsAndResidual,
 						(new_referenceToFrame));
@@ -390,7 +372,6 @@ SE3 SE3Tracker::trackFrame(TrackingReference* reference, Frame* frame,
 				// accept inc?
 				if (error < lastErr) {
 
-					std::cout << "ACCEPT MPt" << ++pp << std::endl;
 					// accept inc
 					referenceToFrame = new_referenceToFrame;
 					if (useAffineLightningEstimation) {
@@ -398,7 +379,6 @@ SE3 SE3Tracker::trackFrame(TrackingReference* reference, Frame* frame,
 						affineEstimation_b = affineEstimation_b_lastIt;
 					}
 
-					std::cout << "ACCEPT MPt" << ++pp << std::endl;
 					if (enablePrintDebugInfo && printTrackingIterationInfo) {
 						// debug output
 						printf(
@@ -415,7 +395,6 @@ SE3 SE3Tracker::trackFrame(TrackingReference* reference, Frame* frame,
 								referenceToFrame.log()[5]);
 					}
 
-					std::cout << "ACCEPT MPt" << ++pp << std::endl;
 					// converged?
 					if (error / lastErr > settings.convergenceEps[lvl]) {
 						if (enablePrintDebugInfo && printTrackingIterationInfo) {
@@ -426,7 +405,6 @@ SE3 SE3Tracker::trackFrame(TrackingReference* reference, Frame* frame,
 						iteration = settings.maxItsPerLvl[lvl];
 					}
 
-					std::cout << "ACCEPT MPt" << ++pp << std::endl;
 					last_residual = lastErr = error;
 
 					if (LM_lambda <= 0.2)
@@ -436,27 +414,22 @@ SE3 SE3Tracker::trackFrame(TrackingReference* reference, Frame* frame,
 
 					break;
 				} else {
-					std::cout << "ELSE MPt" << ++pp << std::endl;
 					if (enablePrintDebugInfo && printTrackingIterationInfo) {
 						printf(
 								"(%d-%d): REJECTED increment of %f with lambda %.1f, (residual: %f -> %f)\n",
 								lvl, iteration, sqrt(inc.dot(inc)), LM_lambda,
 								lastErr, error);
 					}
-					std::cout << "ELSE MPt" << ++pp << std::endl;
-					// SEGFAULT
+
 					if (!(inc.dot(inc) > settings.stepSizeMin[lvl])) {
-						std::cout << "getting settings maxItsPerLvl\n";
 						if (enablePrintDebugInfo && printTrackingIterationInfo) {
 							printf(
 									"(%d-%d): FINISHED pyramid level (stepsize too small).\n",
 									lvl, iteration);
 						}
 						iteration = settings.maxItsPerLvl[lvl];
-						std::cout << "aquired\n";
 						break;
 					}
-					std::cout << "ELSE MPt" << ++pp << std::endl;
 
 					if (LM_lambda == 0)
 						LM_lambda = 0.2;
@@ -467,12 +440,9 @@ SE3 SE3Tracker::trackFrame(TrackingReference* reference, Frame* frame,
 		}
 	}
 
-	std::cout << "Narrow Pt" << ++tp << std::endl;
-
 	if (plotTracking)
 		Util::displayImage("TrackingResidual", debugImageResiduals, false);
 
-	std::cout << "Narrow Pt" << ++tp << std::endl;
 	if (enablePrintDebugInfo && printTrackingIterationInfo) {
 		printf("Tracking: ");
 		for (int lvl = PYRAMID_LEVELS - 1; lvl >= 0; lvl--) {
@@ -495,7 +465,6 @@ SE3 SE3Tracker::trackFrame(TrackingReference* reference, Frame* frame,
 			&& lastGoodCount / (lastGoodCount + lastBadCount)
 					> MIN_GOODPERGOODBAD_PIXEL;
 
-	std::cout << "Narrow Pt" << ++tp << std::endl;
 	if (trackingWasGood)
 		reference->keyframe->numFramesTrackedOnThis++;
 
@@ -884,7 +853,6 @@ float SE3Tracker::calcResidualAndBuffers(const Eigen::Vector3f* refPoint,
 		const Sophus::SE3f& referenceToFrame, int level, bool plotResidual) {
 	calcResidualAndBuffers_debugStart();
 
-	std::cout << "calcResidualAndBuffers\n";
 	if (plotResidual)
 		debugImageResiduals.setTo(0);
 
@@ -917,8 +885,6 @@ float SE3Tracker::calcResidualAndBuffers(const Eigen::Vector3f* refPoint,
 	float sxx = 0, syy = 0, sx = 0, sy = 0, sw = 0;
 
 	float usageCount = 0;
-
-	std::cout << "fin var setup\n";
 
 	for (; refPoint < refPoint_max; refPoint++, refColVar++, idxBuf++) {
 
@@ -968,20 +934,16 @@ float SE3Tracker::calcResidualAndBuffers(const Eigen::Vector3f* refPoint,
 		*(buf_d + idx) = 1.0f / (*refPoint)[2];
 		*(buf_idepthVar + idx) = (*refColVar)[1];
 		idx++;
-		std::cout << "loop refPoint " << refPoint << std::endl;
+
 		if (isGood) {
-			std::cout << "residual:" << residual << std::endl;
-			// SEGFAULT??????
 			sumResUnweighted += residual * residual;
 			sumSignedRes += residual;
 			goodCount++;
 		} else
 			badCount++;
 
-		std::cout << "GC " << goodCount << " : BC " << badCount << std::endl;
-		// SEGFAULT??
 		float depthChange = (*refPoint)[2] / Wxp[2];// if depth becomes larger: pixel becomes "smaller", hence count it less.
-		std::cout << "depthchange " << depthChange << std::endl;
+
 		usageCount += depthChange < 1 ? depthChange : 1;
 
 		// DEBUG STUFF
@@ -1009,7 +971,6 @@ float SE3Tracker::calcResidualAndBuffers(const Eigen::Vector3f* refPoint,
 
 		}
 	}
-	std::cout << "fin for loop\n";
 	buf_warped_size = idx;
 
 	pointUsage = usageCount / (float) refNum;

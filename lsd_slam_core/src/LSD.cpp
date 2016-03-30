@@ -151,61 +151,56 @@ void run(SlamSystem * system, Undistorter* undistorter,
 	while (!imageSource->IsAtEnd()) {
 		if (lsdDone.getValue())
 			break;
-		int tp = 0;
-		std::cout << "Test Pt" << ++tp << std::endl;
-		// SEGFAULT
+
 		cv::Mat imageDist = cv::Mat(h, w, CV_8U);
 		imageDist = imageSource->GetNextImage();
-		std::cout << "Test Pt" << ++tp << std::endl;
-		// SEGFAULT
 		if (logReader) {
+			// This isn't a function....
+			// but we currently don't use logReaders so I'll just leave it
+			// @fix
 			logReader->getNext();
 
 			cv::Mat3b img(h, w, (cv::Vec3b *) logReader->rgb);
 
 			cv::cvtColor(img, imageDist, CV_RGB2GRAY);
-		} else if (files.size() != 0) {
-			imageDist = cv::imread(files[i], CV_LOAD_IMAGE_GRAYSCALE);
+		} /*else if (files.size() != 0) {
 
-			if (imageDist.rows != h_inp || imageDist.cols != w_inp) {
-				if (imageDist.rows * imageDist.cols == 0)
-					printf("failed to load image %s! skipping.\n",
-							files[i].c_str());
-				else
-					printf(
-							"image %s has wrong dimensions - expecting %d x %d, found %d x %d. Skipping.\n",
-							files[i].c_str(), w, h, imageDist.cols,
-							imageDist.rows);
-				continue;
-			}
-		}
-		std::cout << "Test Pt" << ++tp << std::endl;
+		 imageDist = cv::imread(files[i], CV_LOAD_IMAGE_GRAYSCALE);
+
+		 if (imageDist.rows != h_inp || imageDist.cols != w_inp) {
+
+		 if (imageDist.rows * imageDist.cols == 0)
+		 printf("failed to load image %s! skipping.\n",
+		 files[i].c_str());
+		 else
+		 printf(
+		 "image %s has wrong dimensions - expecting %d x %d, found %d x %d. Skipping.\n",
+		 files[i].c_str(), w, h, imageDist.cols,
+		 imageDist.rows);
+		 continue;
+		 }
+		 }*/
 
 		if (imageDist.empty()) {
 			continue;
 		}
-		std::cout << "Test Pt" << ++tp << std::endl;
 
 		assert(imageDist.type() == CV_8U);
-		std::cout << "Test Pt" << ++tp << std::endl;
 
 		undistorter->undistort(imageDist, image);
-		std::cout << "Test Pt" << ++tp << std::endl;
 
 		assert(image.type() == CV_8U);
-		std::cout << "Test Pt" << ++tp << std::endl;
 
 		if (runningIDX == 0) {
 			system->randomInit(image.data, fakeTimeStamp, runningIDX);
 		} else {
 			system->trackFrame(image.data, runningIDX, hz == 0, fakeTimeStamp);
 		}
-		std::cout << "Assigning Pose\n";
+
 		gui.pose.assignValue(system->getCurrentPoseEstimateScale());
-		std::cout << "Pose Assigned\n";
+
 		runningIDX++;
 		fakeTimeStamp += 0.03;
-		std::cout << "Test Pt" << ++tp << std::endl;
 
 		if (fullResetRequested) {
 			printf("FULL RESET!\n");
@@ -308,6 +303,10 @@ int main(int argc, char** argv) {
 
 	boost::thread lsdThread(run, system, undistorter, outputWrapper, K);
 
+	// the name of the .ply file to save the map to
+	std::string ply;
+	bool shouldSavePly = Parse::arg(argc, argv, "-p", ply) > 0;
+
 	while (!lsdDone.getValue() && !system->finalized/*pangolin::ShouldQuit()*/) {
 		if (lsdDone.getValue() && !system->finalized) {
 			system->finalize();
@@ -323,7 +322,17 @@ int main(int argc, char** argv) {
 //
 //		gui.postCall();
 
-		gui.savePLY("live.ply");
+		gui.publish();
+
+		if (shouldSavePly) {
+			gui.savePLY(ply);
+		}
+
+	}
+
+	if (!shouldSavePly && !(Parse::flag(argc, argv, "-nop") > 0)) {
+		std::cout
+				<< "WARNING: You have not saved the point cloud to a file!\nUse -p nameoffile.ply to save your pointcloud (Use -nop to hide this message)\n";
 	}
 
 	lsdDone.assignValue(true);
