@@ -154,27 +154,30 @@ void run(SlamSystem * system, Undistorter* undistorter,
 
 		cv::Mat imageDist = cv::Mat(h, w, CV_8U);
 		imageDist = imageSource->GetNextImage();
-		if (logReader) {
-			logReader->getNext();
 
-			cv::Mat3b img(h, w, (cv::Vec3b *) logReader->rgb);
+		// TREVOR: All of this code is in the image source now.
 
-			cv::cvtColor(img, imageDist, CV_RGB2GRAY);
-		} else if (files.size() != 0) {
-			imageDist = cv::imread(files[i], CV_LOAD_IMAGE_GRAYSCALE);
-
-			if (imageDist.rows != h_inp || imageDist.cols != w_inp) {
-				if (imageDist.rows * imageDist.cols == 0)
-					printf("failed to load image %s! skipping.\n",
-							files[i].c_str());
-				else
-					printf(
-							"image %s has wrong dimensions - expecting %d x %d, found %d x %d. Skipping.\n",
-							files[i].c_str(), w, h, imageDist.cols,
-							imageDist.rows);
-				continue;
-			}
-		}
+//		if (logReader) {
+//			logReader->getNext();
+//
+//			cv::Mat3b img(h, w, (cv::Vec3b *) logReader->rgb);
+//
+//			cv::cvtColor(img, imageDist, CV_RGB2GRAY);
+//		} else {
+//			imageDist = cv::imread(files[i], CV_LOAD_IMAGE_GRAYSCALE);
+//
+//			if (imageDist.rows != h_inp || imageDist.cols != w_inp) {
+//				if (imageDist.rows * imageDist.cols == 0)
+//					printf("failed to load image %s! skipping.\n",
+//							files[i].c_str());
+//				else
+//					printf(
+//							"image %s has wrong dimensions - expecting %d x %d, found %d x %d. Skipping.\n",
+//							files[i].c_str(), w, h, imageDist.cols,
+//							imageDist.rows);
+//				continue;
+//			}
+//		}
 
 		if (imageDist.empty()) {
 			continue;

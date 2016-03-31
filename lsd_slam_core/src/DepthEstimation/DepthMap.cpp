@@ -896,6 +896,8 @@ void DepthMap::initializeRandomly(Frame* new_frame)
 			if(maxGradients[x+y*width] > MIN_ABS_GRAD_CREATE)
 			{
 				float idepth = 0.5f + 1.0f * ((rand() % 100001) / 100000.0f);
+//TODO: PLACE WHERE WE COULD USE A DISPARITY MAP RATHER THAN INITIALIZE RANDOMLY
+// WOULD HAVE TO SCALE TO BETWEEN .5 and 1.5
 				currentDepthMap[x+y*width] = DepthMapPixelHypothesis(
 						idepth,
 						idepth,
