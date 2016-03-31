@@ -25,7 +25,7 @@
 #include "util/Parse.h"
 #include "util/globalFuncs.h"
 #include "util/ThreadMutexObject.h"
-#include "IOWrapper/Pangolin/PangolinOutput3DWrapper.h"
+//#include "IOWrapper/Pangolin/PangolinOutput3DWrapper.h"
 #include "IOWrapper/DataOutput/DataOutput3DWrapper.h"
 #include "SlamSystem.h"
 #include "util/ImageSource.h"
@@ -155,29 +155,32 @@ void run(SlamSystem * system, Undistorter* undistorter,
 		cv::Mat imageDist = cv::Mat(h, w, CV_8U);
 		imageDist = imageSource->GetNextImage();
 
-		// TREVOR: All of this code is in the image source now.
+		if (logReader) {
+			// This isn't a function....
+			// but we currently don't use logReaders so I'll just leave it
+			// @fix
+			logReader->getNext();
 
-//		if (logReader) {
-//			logReader->getNext();
-//
-//			cv::Mat3b img(h, w, (cv::Vec3b *) logReader->rgb);
-//
-//			cv::cvtColor(img, imageDist, CV_RGB2GRAY);
-//		} else {
-//			imageDist = cv::imread(files[i], CV_LOAD_IMAGE_GRAYSCALE);
-//
-//			if (imageDist.rows != h_inp || imageDist.cols != w_inp) {
-//				if (imageDist.rows * imageDist.cols == 0)
-//					printf("failed to load image %s! skipping.\n",
-//							files[i].c_str());
-//				else
-//					printf(
-//							"image %s has wrong dimensions - expecting %d x %d, found %d x %d. Skipping.\n",
-//							files[i].c_str(), w, h, imageDist.cols,
-//							imageDist.rows);
-//				continue;
-//			}
-//		}
+			cv::Mat3b img(h, w, (cv::Vec3b *) logReader->rgb);
+
+			cv::cvtColor(img, imageDist, CV_RGB2GRAY);
+		} /*else if (files.size() != 0) {
+
+		 imageDist = cv::imread(files[i], CV_LOAD_IMAGE_GRAYSCALE);
+
+		 if (imageDist.rows != h_inp || imageDist.cols != w_inp) {
+
+		 if (imageDist.rows * imageDist.cols == 0)
+		 printf("failed to load image %s! skipping.\n",
+		 files[i].c_str());
+		 else
+		 printf(
+		 "image %s has wrong dimensions - expecting %d x %d, found %d x %d. Skipping.\n",
+		 files[i].c_str(), w, h, imageDist.cols,
+		 imageDist.rows);
+		 continue;
+		 }
+		 }*/
 
 		if (imageDist.empty()) {
 			continue;
@@ -247,7 +250,7 @@ int main(int argc, char** argv) {
 	Resolution::getInstance(w, h);
 	Intrinsics::getInstance(fx, fy, cx, cy);
 
-	gui.initImages();
+//	gui.initImages();
 
 //	Output3DWrapper* outputWrapper = new PangolinOutput3DWrapper(w, h, gui);
 	Output3DWrapper* outputWrapper = new DataOutput3DWrapper(w, h, gui);
@@ -290,7 +293,6 @@ int main(int argc, char** argv) {
 			} else {
 				printf("could not load file list! wrong path / file?\n");
 			}
-
 			numFrames = (int) files.size();
 
 			// TREVOR: imageSource is based on list of files
@@ -302,20 +304,36 @@ int main(int argc, char** argv) {
 
 	boost::thread lsdThread(run, system, undistorter, outputWrapper, K);
 
-	while (!pangolin::ShouldQuit()) {
+	// the name of the .ply file to save the map to
+	std::string ply;
+	bool shouldSavePly = Parse::arg(argc, argv, "-p", ply) > 0;
+
+	while (!lsdDone.getValue() && !system->finalized/*pangolin::ShouldQuit()*/) {
 		if (lsdDone.getValue() && !system->finalized) {
 			system->finalize();
 		}
 
-		gui.preCall();
+//		gui.preCall();
+//
+//		gui.drawKeyframes();
+//
+//		gui.drawFrustum();
+//
+//		gui.drawImages();
+//
+//		gui.postCall();
 
-		gui.drawKeyframes();
+		gui.publish();
 
-		gui.drawFrustum();
+		if (shouldSavePly) {
+			gui.savePLY(ply);
+		}
 
-		gui.drawImages();
+	}
 
-		gui.postCall();
+	if (!shouldSavePly && !(Parse::flag(argc, argv, "-nop") > 0)) {
+		std::cout
+				<< "WARNING: You have not saved the point cloud to a file!\nUse -p nameoffile.ply to save your pointcloud (Use -nop to hide this message)\n";
 	}
 
 	lsdDone.assignValue(true);

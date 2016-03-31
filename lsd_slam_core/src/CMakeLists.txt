@@ -56,7 +56,7 @@ set(lsd_SOURCE_FILES
 set(SOURCE_FILES
   ${lsd_SOURCE_FILES}
   ${PROJECT_SOURCE_DIR}/IOWrapper/OpenCV/ImageDisplay_OpenCV.cpp
-  ${PROJECT_SOURCE_DIR}/IOWrapper/Pangolin/PangolinOutput3DWrapper.cpp
+  #${PROJECT_SOURCE_DIR}/IOWrapper/Pangolin/PangolinOutput3DWrapper.cpp
   ${PROJECT_SOURCE_DIR}/IOWrapper/DataOutput/DataOutput3DWrapper.cpp
 )
 
@@ -65,7 +65,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}
   ${OpenCV_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIR}
-  ${Pangolin_INCLUDE_DIRS}
+  #${Pangolin_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/thirdparty/Sophus
   ${CSPARSE_INCLUDE_DIR} #Has been set by SuiteParse
   ${CHOLMOD_INCLUDE_DIR} #Has been set by SuiteParse
