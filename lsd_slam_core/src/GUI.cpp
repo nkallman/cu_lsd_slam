@@ -364,43 +364,31 @@ void GUI::savePLY(std::string filename) {
 		if (i->second->initId >= 5) {
 			if (!i->second->hasVbo || i->second->needsUpdate) {
 				i->second->computeVbo();
+				i->second->computePointCloud();
 			}
+
 			totalPnts += i->second->points;
-			for (int j = 0; j < i->second->points; j++) {
-				Sophus::Matrix4f m = i->second->camToWorld.matrix();
-				float x = i->second->vboDat[j].point[0];
-				float y = i->second->vboDat[j].point[1];
-				float z = i->second->vboDat[j].point[2];
-
-				float xabs = m(0, 0) * x + m(0, 1) * y + m(0, 2) * z + m(0, 3);
-				float yabs = m(1, 0) * x + m(1, 1) * y + m(1, 2) * z + m(1, 3);
-				float zabs = m(2, 0) * x + m(2, 1) * y + m(2, 2) * z + m(2, 3);
-
-				pts += boost::lexical_cast < std::string > (xabs) + " ";
-				pts += boost::lexical_cast < std::string > (yabs) + " ";
-				pts += boost::lexical_cast < std::string > (zabs);
-				pts += "\n";
-			}
+			pts += i->second->getPointCloudString();
 		}
 
-		std::string header = "ply\n";
-		header += "format ascii 1.0\n";
-		header += "element vertex " + boost::lexical_cast < std::string
-				> (totalPnts) + "\n";
-		header += "property float x\n";
-		header += "property float y\n";
-		header += "property float z\n";
-		header += "end_header\n";
+	}
 
-		if (totalPnts > prevPoints) {
-			std::cout << header; // << pts;
-			std::ofstream o;
-			o.open(filename);
-			o << header << pts;
-			o.close();
-			prevPoints = totalPnts;
-		}
+	std::string header = "ply\n";
+	header += "format ascii 1.0\n";
+	header += "element vertex " + boost::lexical_cast < std::string
+			> (totalPnts) + "\n";
+	header += "property float x\n";
+	header += "property float y\n";
+	header += "property float z\n";
+	header += "end_header\n";
 
+	if (totalPnts > prevPoints) {
+//		std::cout << header; // << pts;
+		std::ofstream o;
+		o.open(filename);
+		o << header << pts;
+		o.close();
+		prevPoints = totalPnts;
 	}
 
 	lock.unlock();

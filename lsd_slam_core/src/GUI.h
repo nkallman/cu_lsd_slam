@@ -10,7 +10,7 @@
 
 #define GLM_FORCE_RADIANS
 
-#include <pangolin/pangolin.h>
+//#include <pangolin/pangolin.h>
 //#include <pangolin/gl/gl.h>
 //#include <pangolin/gl/gldraw.h>
 //#include <map>
@@ -21,6 +21,7 @@
 #include "IOWrapper/DataOutput/Keyframe.h"
 #include "util/ThreadMutexObject.h"
 #include "DataStructures/Frame.h"
+#include <fstream>
 
 #define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
 

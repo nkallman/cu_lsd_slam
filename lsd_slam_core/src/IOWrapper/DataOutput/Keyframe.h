@@ -28,15 +28,18 @@ class Keyframe {
 public:
 	Keyframe() :
 			pointData(0), hasVbo(false), points(0), needsUpdate(false) {
+		pcString = "";
 	}
 
 	virtual ~Keyframe() {
 		if (pointData)
 			delete[] pointData;
 
-		if (hasVbo)
+		if (hasVbo) {
 //			glDeleteBuffers(1, &vbo);
 			delete[] vboDat;
+			delete[] pointCloud;
+		}
 	}
 
 	struct MyVertex {
@@ -46,12 +49,10 @@ public:
 
 	void updatePoints(Keyframe * newFrame) {
 		if (pointData == 0) {
-			pointData = new unsigned char[width * height
-					* sizeof(InputPointDense)];
+			pointData = new unsigned char[width * height * sizeof(InputPointDense)];
 		}
 
-		memcpy(pointData, newFrame->pointData,
-				width * height * sizeof(InputPointDense));
+		memcpy(pointData, newFrame->pointData, width * height * sizeof(InputPointDense));
 
 		needsUpdate = true;
 	}
@@ -93,12 +94,10 @@ public:
 
 				depth4 *= depth4;
 
-				if (originalInput[x + y * width].idepth_var * depth4
-						> my_scaledTH)
+				if (originalInput[x + y * width].idepth_var * depth4 > my_scaledTH)
 					continue;
 
-				if (originalInput[x + y * width].idepth_var * depth4 * my_scale
-						* my_scale > my_absTH)
+				if (originalInput[x + y * width].idepth_var * depth4 * my_scale * my_scale > my_absTH)
 					continue;
 
 				if (my_minNearSupport > 1) {
@@ -107,11 +106,8 @@ public:
 						for (int dy = -1; dy < 2; dy++) {
 							int idx = x + dx + (y + dy) * width;
 							if (originalInput[idx].idepth > 0) {
-								float diff = originalInput[idx].idepth
-										- 1.0f / depth;
-								if (diff * diff
-										< 2
-												* originalInput[x + y * width].idepth_var)
+								float diff = originalInput[idx].idepth - 1.0f / depth;
+								if (diff * diff < 2 * originalInput[x + y * width].idepth_var)
 									nearSupport++;
 							}
 						}
@@ -125,12 +121,10 @@ public:
 				tmpBuffer[points].point[1] = (y * fyi + cyi) * depth;
 				tmpBuffer[points].point[2] = depth;
 				tmpBuffer[points].color[3] = 100;
-				tmpBuffer[points].color[2] =
-						originalInput[x + y * width].color[0];
-				tmpBuffer[points].color[1] =
-						originalInput[x + y * width].color[1];
-				tmpBuffer[points].color[0] =
-						originalInput[x + y * width].color[2];
+				tmpBuffer[points].color[2] = originalInput[x + y * width].color[0];
+				tmpBuffer[points].color[1] = originalInput[x + y * width].color[1];
+				tmpBuffer[points].color[0] = originalInput[x + y * width].color[2];
+
 				points++;
 			}
 		}
@@ -138,8 +132,8 @@ public:
 		if (needsUpdate) {
 			delete[] vboDat;
 		}
-		vboDat = new MyVertex[width * height];
-		std::copy(tmpBuffer, tmpBuffer + points, vboDat);
+		vboDat = new MyVertex[points];
+		std::copy(tmpBuffer, tmpBuffer + points - 1, vboDat);
 
 //		glGenBuffers(1, &vbo);
 //		glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -155,6 +149,42 @@ public:
 		hasVbo = true;
 
 		needsUpdate = false;
+	}
+
+	void computePointCloud() {
+		if (needsUpdate) {
+			delete[] pointCloud;
+			pcString = "";
+		}
+		pointCloud = new MyVertex[points];
+
+		for (int i = 0; i < points; i++) {
+			Sophus::Matrix4f m = camToWorld.matrix();
+			float x = vboDat[i].point[0];
+			float y = vboDat[i].point[1];
+			float z = vboDat[i].point[2];
+
+			// x absolute
+			pointCloud[i].point[0] = m(0, 0) * x + m(0, 1) * y + m(0, 2) * z + m(0, 3);
+			// y absolute
+			pointCloud[i].point[1] = m(1, 0) * x + m(1, 1) * y + m(1, 2) * z + m(1, 3);
+			// z absolute
+			pointCloud[i].point[2] = m(2, 0) * x + m(2, 1) * y + m(2, 2) * z + m(2, 3);
+
+			pcString += std::to_string(pointCloud[i].point[0]) + " ";
+			pcString += std::to_string(pointCloud[i].point[1]) + " ";
+			pcString += std::to_string(pointCloud[i].point[2]);
+			pcString += "\n";
+
+		}
+	}
+
+	MyVertex * getPointCloud() {
+		return pointCloud;
+	}
+
+	std::string getPointCloudString() {
+		return pcString;
 	}
 
 	void drawPoints() {
@@ -232,6 +262,8 @@ public:
 	bool hasVbo;
 //	GLuint vbo;
 	MyVertex * vboDat;
+	MyVertex * pointCloud;
+	std::string pcString;
 	int points;
 	bool needsUpdate;
 };
