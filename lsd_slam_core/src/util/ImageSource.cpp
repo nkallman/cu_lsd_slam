@@ -41,7 +41,6 @@ CameraImageSource::CameraImageSource(int cameraIndex) :
 }
 
 bool CameraImageSource::IsAtEnd() {
-	std::cout << "camera is at end?";
 	return false;
 }
 
@@ -59,9 +58,7 @@ cv::Mat CameraImageSource::GetNextImage() {
 		if (imageDist.rows * imageDist.cols == 0) {
 			printf("failed to take image.\n");
 		} else {
-			printf(
-					"image has wrong dimensions - expecting %d x %d, found %d x %d. Skipping.\n",
-					w, h, imageDist.cols, imageDist.rows);
+			printf("image has wrong dimensions - expecting %d x %d, found %d x %d. Skipping.\n", w, h, imageDist.cols, imageDist.rows);
 		}
 	}
 
@@ -108,8 +105,7 @@ FileListImageSource::FileListImageSource(std::vector<std::string> fileList) :
 }
 
 bool FileListImageSource::IsAtEnd() {
-	std::cout << "index = " << index << " - files.size = " << files.size()
-			<< std::endl;
+	std::cout << "index = " << index << " - files.size = " << files.size() << std::endl;
 	return index == files.size() - 1;
 }
 
@@ -124,12 +120,9 @@ cv::Mat FileListImageSource::GetNextImage() {
 
 	if (imageDist.rows != h || imageDist.cols != w) {
 		if (imageDist.rows * imageDist.cols == 0) {
-			printf("failed to load image %s! skipping.\n",
-					files[index].c_str());
+			printf("failed to load image %s! skipping.\n", files[index].c_str());
 		} else {
-			printf(
-					"image %s has wrong dimensions - expecting %d x %d, found %d x %d. Skipping.\n",
-					files[index].c_str(), w, h, imageDist.cols, imageDist.rows);
+			printf("image %s has wrong dimensions - expecting %d x %d, found %d x %d. Skipping.\n", files[index].c_str(), w, h, imageDist.cols, imageDist.rows);
 		}
 	}
 
