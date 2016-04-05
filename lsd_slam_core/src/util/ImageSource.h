@@ -10,7 +10,6 @@
 
 #include <string>
 #include "RawLogReader.h"
-#include "../../../../lsdslamd/src/lsdslamd/h/CameraModule.h"
 #include <tbb/concurrent_queue.h>
 
 class ImageSource {
@@ -47,6 +46,7 @@ public:
 
 private:
 	std::vector<std::string> files;
+
 };
 
 class CameraImageSource: public ImageSource {
@@ -62,7 +62,7 @@ private:
 // This class will use concurrent_bounded_queue from CameraModule.h as the source of its images
 class CameraModuleImageSource: public ImageSource {
 public:
-	CameraModuleImageSource();
+	CameraModuleImageSource(tbb::concurrent_bounded_queue<cv::Mat> &imageQueue);
 	bool IsAtEnd();
 
 	// Reads a new image or set of images and returns the left image
@@ -80,6 +80,7 @@ private:
 	cv::Mat left;
 	cv::Mat right;
 	bool isStereo;
+	tbb::concurrent_bounded_queue<cv::Mat> &imageQueue;
 };
 
 #endif /* UTILITIES_IMAGESOURCE_H_ */

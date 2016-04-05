@@ -130,13 +130,13 @@ cv::Mat FileListImageSource::GetNextImage() {
 }
 
 // CameraModuleImageSource Implementation
-CameraModuleImageSource::CameraModuleImageSource() :
-		ImageSource() {
-
+CameraModuleImageSource::CameraModuleImageSource(tbb::concurrent_bounded_queue<cv::Mat> &imageQueue) :
+		ImageSource(), imageQueue(imageQueue) {
+	this->isStereo  = false;
 }
 
 bool CameraModuleImageSource::IsAtEnd() {
-	return imageQueue == null;
+	return imageQueue.size() == 0;
 }
 
 // Reads in next set of images and returns the left image from this new set.
@@ -151,16 +151,16 @@ cv::Mat CameraModuleImageSource::GetNextImage() {
 }
 
 // Gets the right image from last read. Does not read new set of images.
-cv::Mat CameraModuleImageSource::GetRight() {
+cv::Mat CameraModuleImageSource::GetRightImage() {
 	return right;
 }
 
 // Gets the left image from the last read. Does not read new images.
-cv::Mat CameraModuleImageSource::GetLeft() {
+cv::Mat CameraModuleImageSource::GetLeftImage() {
 	return left;
 }
 
-bool CameraModuleImageSource::SetStereo(bool isStereoCam) {
+void CameraModuleImageSource::SetStereo(bool isStereoCam) {
 	isStereo = isStereoCam;
 }
 
