@@ -78,6 +78,6 @@ add_library(lsdslam SHARED ${SOURCE_FILES})
 target_link_libraries(lsdslam ${FABMAP_LIB} ${Boost_LIBRARIES} ${OpenCV_LIBS} ${TBB_LIBRARIES} g2o_core g2o_stuff csparse cxsparse g2o_solver_csparse g2o_csparse_extension g2o_types_sim3 g2o_types_sba)
 
 # build image node
-add_executable(LSD LSD.cpp)
+add_library(LSD LSD.cpp)
 target_link_libraries(LSD lsdslam ${Pangolin_LIBRARIES})
 

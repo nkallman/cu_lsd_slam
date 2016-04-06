@@ -133,10 +133,8 @@ int getFile(std::string source, std::vector<std::string> &files) {
 
 }
 
-using namespace lsd_slam;
-
-void run(SlamSystem * system, Undistorter* undistorter,
-		Output3DWrapper* outputWrapper, Sophus::Matrix3f K) {
+void run(lsd_slam::SlamSystem * system, lsd_slam::Undistorter* undistorter,
+		lsd_slam::Output3DWrapper* outputWrapper, Sophus::Matrix3f K) {
 	// get HZ
 	double hz = 30;
 
@@ -203,14 +201,14 @@ void run(SlamSystem * system, Undistorter* undistorter,
 		runningIDX++;
 		fakeTimeStamp += 0.03;
 
-		if (fullResetRequested) {
+		if (lsd_slam::fullResetRequested) {
 			printf("FULL RESET!\n");
 			delete system;
 
-			system = new SlamSystem(w, h, K, doSlam);
+			system = new lsd_slam::SlamSystem(w, h, K, lsd_slam::doSlam);
 			system->setVisualization(outputWrapper);
 
-			fullResetRequested = false;
+			lsd_slam::fullResetRequested = false;
 			runningIDX = 0;
 		}
 		i++;
@@ -219,14 +217,14 @@ void run(SlamSystem * system, Undistorter* undistorter,
 	lsdDone.assignValue(true);
 }
 
-int main(int argc, char** argv) {
+int mainSLAM(int argc, char** argv) {
 	// get camera calibration in form of an undistorter object.
 	// if no undistortion is required, the undistorter will just pass images through.
 	std::string calibFile;
-	Undistorter* undistorter = 0;
+	lsd_slam::Undistorter* undistorter = 0;
 
 	if (Parse::arg(argc, argv, "-c", calibFile) > 0) {
-		undistorter = Undistorter::getUndistorterForFile(calibFile.c_str());
+		undistorter = lsd_slam::Undistorter::getUndistorterForFile(calibFile.c_str());
 	}
 
 	if (undistorter == 0) {
@@ -253,10 +251,10 @@ int main(int argc, char** argv) {
 //	gui.initImages();
 
 //	Output3DWrapper* outputWrapper = new PangolinOutput3DWrapper(w, h, gui);
-	Output3DWrapper* outputWrapper = new DataOutput3DWrapper(w, h, gui);
+	lsd_slam::Output3DWrapper* outputWrapper = new lsd_slam::DataOutput3DWrapper(w, h, gui);
 
 	// make slam system
-	SlamSystem * system = new SlamSystem(w, h, K, doSlam);
+	lsd_slam::SlamSystem * system = new lsd_slam::SlamSystem(w, h, K, lsd_slam::doSlam);
 	system->setVisualization(outputWrapper);
 
 	//  TODO: LIVE slam
