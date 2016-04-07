@@ -22,13 +22,21 @@
 
 #include "GUI.h"
 
-ThreadMutexObject<bool> lsdDone(false);
-RawLogReader * logReader = 0;
-int numFrames = 0;
+//ThreadMutexObject<bool> SlamModule::lsdDone(false);
+//RawLogReader * SlamModule::logReader = 0;
+//int SlamModule::numFrames = 0;
+//ImageSource* SlamModule::imageSource;
+//std::vector<std::string> SlamModule::files;
+//int SlamModule::w, SlamModule::h, SlamModule::w_inp, SlamModule::h_inp;
+//GUI SlamModule::gui;
 
 class SlamModule {
 	// TREVOR: IMAGE SOURCE VARIABLE
 	private:
+		static ThreadMutexObject<bool> lsdDone;
+		static RawLogReader * logReader;
+		static int numFrames;
+
 		static ImageSource *imageSource;
 
 		static std::vector<std::string> files;
@@ -60,5 +68,5 @@ class SlamModule {
 		/**
 		 * Execute the main SLAM process.
 		 */
-		static int main(std::string calibFile, std::string source, std::string ply);
+		static int main(std::string calibFile, std::string source, std::string ply, bool save);
 };

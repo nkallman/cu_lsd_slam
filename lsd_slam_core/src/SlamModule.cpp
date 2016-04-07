@@ -43,35 +43,32 @@
 
 #include "GUI.h"
 
-ThreadMutexObject<bool> lsdDone(false);
-RawLogReader * logReader = 0;
-int numFrames = 0;
 
-	// TREVOR: IMAGE SOURCE VARIABLE
-static ImageSource *imageSource;
+ThreadMutexObject<bool> SlamModule::lsdDone(false);
+RawLogReader * SlamModule::logReader = 0;
+int SlamModule::numFrames = 0;
+ImageSource* SlamModule::imageSource;
+std::vector<std::string> SlamModule::files;
+int SlamModule::w, SlamModule::h, SlamModule::w_inp, SlamModule::h_inp;
+GUI SlamModule::gui;
 
-static std::vector<std::string> files;
-static int w, h, w_inp, h_inp;
-
-static GUI gui;
-
-static std::string &SlamModule::ltrim(std::string &s) {
+std::string &SlamModule::ltrim(std::string &s) {
 	s.erase(s.begin(),
 			std::find_if(s.begin(), s.end(),
 					std::not1(std::ptr_fun<int, int>(std::isspace))));
 	return s;
 }
-static std::string &SlamModule::rtrim(std::string &s) {
+std::string &SlamModule::rtrim(std::string &s) {
 	s.erase(
 			std::find_if(s.rbegin(), s.rend(),
 					std::not1(std::ptr_fun<int, int>(std::isspace))).base(),
 			s.end());
 	return s;
 }
-static std::string &SlamModule::trim(std::string &s) {
+std::string &SlamModule::trim(std::string &s) {
 	return ltrim(rtrim(s));
 }
-static int SlamModule::getdir(std::string dir, std::vector<std::string> &files) {
+int SlamModule::getdir(std::string dir, std::vector<std::string> &files) {
 	DIR *dp;
 	struct dirent *dirp;
 	if ((dp = opendir(dir.c_str())) == NULL) {
@@ -101,7 +98,7 @@ static int SlamModule::getdir(std::string dir, std::vector<std::string> &files) 
 /**
  * Get file a file from a source and place it in a file vector.
  */
-static int SlamModule::getFile(std::string source, std::vector<std::string> &files) {
+int SlamModule::getFile(std::string source, std::vector<std::string> &files) {
 	std::ifstream f(source.c_str());
 
 	if (f.good() && f.is_open()) {
@@ -142,7 +139,7 @@ static int SlamModule::getFile(std::string source, std::vector<std::string> &fil
 /**
  * Run SLAM inside main process.
  */
-static void SlamModule::run(lsd_slam::SlamSystem * system, lsd_slam::Undistorter* undistorter,
+void SlamModule::run(lsd_slam::SlamSystem * system, lsd_slam::Undistorter* undistorter,
 		lsd_slam::Output3DWrapper* outputWrapper, Sophus::Matrix3f K) {
 	// get HZ
 	double hz = 30;
@@ -229,7 +226,7 @@ static void SlamModule::run(lsd_slam::SlamSystem * system, lsd_slam::Undistorter
 /**
  * Execute the main SLAM process.
  */
-static int SlamModule::main(std::string calibFile, std::string source, std::string ply) {
+int SlamModule::main(std::string calibFile, std::string source, std::string ply, bool save) {
 	// get camera calibration in form of an undistorter object.
 	// if no undistortion is required, the undistorter will just pass images through.
 	lsd_slam::Undistorter* undistorter = 0;
@@ -337,7 +334,7 @@ static int SlamModule::main(std::string calibFile, std::string source, std::stri
 
 	}
 
-	if (!shouldSavePly && !(Parse::flag(argc, argv, "-nop") > 0)) {
+	if (!shouldSavePly && !save) {
 		std::cout
 				<< "WARNING: You have not saved the point cloud to a file!\nUse -p nameoffile.ply to save your pointcloud (Use -nop to hide this message)\n";
 	}

@@ -1,8 +1,7 @@
 #include "SlamModule.h"
 
 int main() {
-	std::string calibFile, source, ply;
 	SlamModule slamModule;
-	slamModule.main(calibFile, source, ply);
+	slamModule.main("/home/scoutdroneuser/LSD_room/cameraCalibration.cfg", "/home/scoutdroneuser/LSD_room/images", "result.ply", true);
 	return 0;
 }
