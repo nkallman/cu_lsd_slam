@@ -28,37 +28,36 @@ int numFrames = 0;
 
 class SlamModule {
 	// TREVOR: IMAGE SOURCE VARIABLE
-	private:
-		static ImageSource *imageSource;
+private:
+	static ImageSource *imageSource;
 
-		static std::vector<std::string> files;
-		static int w, h, w_inp, h_inp;
+	static std::vector<std::string> files;
+	static int w, h, w_inp, h_inp;
 
-		static GUI gui;
+	static GUI gui;
 
-	public:
-		static std::string &ltrim(std::string &s);
-		static std::string &rtrim(std::string &s);
-		static std::string &trim(std::string &s);
+public:
+	static std::string &ltrim(std::string &s);
+	static std::string &rtrim(std::string &s);
+	static std::string &trim(std::string &s);
 
-		/**
-		 * Get directory for images
-		 */
-		static int getdir(std::string dir, std::vector<std::string> &files);
+	/**
+	 * Get directory for images
+	 */
+	static int getdir(std::string dir, std::vector<std::string> &files);
 
-		/**
-		 * Get file a file from a source and place it in a file vector.
-		 */
-		static int getFile(std::string source, std::vector<std::string> &files);
+	/**
+	 * Get file a file from a source and place it in a file vector.
+	 */
+	static int getFile(std::string source, std::vector<std::string> &files);
 
-		/**
-		 * Run SLAM inside main process.
-		 */
-		static void run(lsd_slam::SlamSystem * system, lsd_slam::Undistorter* undistorter,
-				lsd_slam::Output3DWrapper* outputWrapper, Sophus::Matrix3f K);
+	/**
+	 * Run SLAM inside main process.
+	 */
+	static void run(lsd_slam::SlamSystem * system, lsd_slam::Undistorter* undistorter, lsd_slam::Output3DWrapper* outputWrapper, Sophus::Matrix3f K);
 
-		/**
-		 * Execute the main SLAM process.
-		 */
-		static int main(std::string calibFile, std::string source, std::string ply);
+	/**
+	 * Execute the main SLAM process.
+	 */
+	static int main(std::string calibFile, std::string source, std::string ply);
 };

@@ -47,7 +47,7 @@ ThreadMutexObject<bool> lsdDone(false);
 RawLogReader * logReader = 0;
 int numFrames = 0;
 
-	// TREVOR: IMAGE SOURCE VARIABLE
+// TREVOR: IMAGE SOURCE VARIABLE
 static ImageSource *imageSource;
 
 static std::vector<std::string> files;
@@ -56,16 +56,11 @@ static int w, h, w_inp, h_inp;
 static GUI gui;
 
 static std::string &SlamModule::ltrim(std::string &s) {
-	s.erase(s.begin(),
-			std::find_if(s.begin(), s.end(),
-					std::not1(std::ptr_fun<int, int>(std::isspace))));
+	s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
 	return s;
 }
 static std::string &SlamModule::rtrim(std::string &s) {
-	s.erase(
-			std::find_if(s.rbegin(), s.rend(),
-					std::not1(std::ptr_fun<int, int>(std::isspace))).base(),
-			s.end());
+	s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
 	return s;
 }
 static std::string &SlamModule::trim(std::string &s) {
@@ -142,8 +137,7 @@ static int SlamModule::getFile(std::string source, std::vector<std::string> &fil
 /**
  * Run SLAM inside main process.
  */
-static void SlamModule::run(lsd_slam::SlamSystem * system, lsd_slam::Undistorter* undistorter,
-		lsd_slam::Output3DWrapper* outputWrapper, Sophus::Matrix3f K) {
+static void SlamModule::run(lsd_slam::SlamSystem * system, lsd_slam::Undistorter* undistorter, lsd_slam::Output3DWrapper* outputWrapper, Sophus::Matrix3f K) {
 	// get HZ
 	double hz = 30;
 
@@ -278,13 +272,11 @@ static int SlamModule::main(std::string calibFile, std::string source, std::stri
 	} else {
 		// TREVOR: if has filename, decide whether to make logreader or files source
 
-		Bytef * decompressionBuffer =
-				new Bytef[Resolution::getInstance().numPixels() * 2];
+		Bytef * decompressionBuffer = new Bytef[Resolution::getInstance().numPixels() * 2];
 		IplImage * deCompImage = 0;
 
 		if (source.substr(source.find_last_of(".") + 1) == "klg") {
-			logReader = new RawLogReader(decompressionBuffer, deCompImage,
-					source);
+			logReader = new RawLogReader(decompressionBuffer, deCompImage, source);
 
 			numFrames = logReader->getNumFrames();
 
@@ -292,11 +284,9 @@ static int SlamModule::main(std::string calibFile, std::string source, std::stri
 			imageSource = new LogReaderImageSource(logReader);
 		} else {
 			if (getdir(source, files) >= 0) {
-				printf("found %d image files in folder %s!\n",
-						(int) files.size(), source.c_str());
+				printf("found %d image files in folder %s!\n", (int) files.size(), source.c_str());
 			} else if (getFile(source, files) >= 0) {
-				printf("found %d image files in file %s!\n", (int) files.size(),
-						source.c_str());
+				printf("found %d image files in file %s!\n", (int) files.size(), source.c_str());
 			} else {
 				printf("could not load file list! wrong path / file?\n");
 			}
@@ -338,8 +328,7 @@ static int SlamModule::main(std::string calibFile, std::string source, std::stri
 	}
 
 	if (!shouldSavePly && !(Parse::flag(argc, argv, "-nop") > 0)) {
-		std::cout
-				<< "WARNING: You have not saved the point cloud to a file!\nUse -p nameoffile.ply to save your pointcloud (Use -nop to hide this message)\n";
+		std::cout << "WARNING: You have not saved the point cloud to a file!\nUse -p nameoffile.ply to save your pointcloud (Use -nop to hide this message)\n";
 	}
 
 	lsdDone.assignValue(true);
