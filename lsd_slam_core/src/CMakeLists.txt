@@ -76,7 +76,7 @@ include_directories(
 
 # build shared library.
 add_library(lsdslam SHARED ${SOURCE_FILES})
-target_compile_features(lsdslam PRIVATE cxx_range_for)
+# target_compile_features(lsdslam PRIVATE cxx_range_for)
 target_link_libraries(lsdslam ${FABMAP_LIB} ${Boost_LIBRARIES} ${OpenCV_LIBS} ${TBB_LIBRARIES} g2o_core g2o_stuff csparse cxsparse g2o_solver_csparse g2o_csparse_extension g2o_types_sim3 g2o_types_sba)
 
 # build image node

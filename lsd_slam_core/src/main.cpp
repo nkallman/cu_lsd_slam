@@ -1,4 +1,5 @@
 #include "SlamModule.h"
+#include <string.h>
 
 int main() {
 	SlamModule slamModule;

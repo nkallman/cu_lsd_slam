@@ -139,8 +139,12 @@ int SlamModule::getFile(std::string source, std::vector<std::string> &files) {
 /**
  * Run SLAM inside main process.
  */
+<<<<<<< HEAD
 void SlamModule::run(lsd_slam::SlamSystem * system, lsd_slam::Undistorter* undistorter,
 		lsd_slam::Output3DWrapper* outputWrapper, Sophus::Matrix3f K) {
+=======
+static void SlamModule::run(lsd_slam::SlamSystem * system, lsd_slam::Undistorter* undistorter, lsd_slam::Output3DWrapper* outputWrapper, Sophus::Matrix3f K) {
+>>>>>>> aa5edbf491d30e7661ac71d7cb2f8cf172e227e9
 	// get HZ
 	double hz = 30;
 
@@ -275,13 +279,11 @@ int SlamModule::main(std::string calibFile, std::string source, std::string ply,
 	} else {
 		// TREVOR: if has filename, decide whether to make logreader or files source
 
-		Bytef * decompressionBuffer =
-				new Bytef[Resolution::getInstance().numPixels() * 2];
+		Bytef * decompressionBuffer = new Bytef[Resolution::getInstance().numPixels() * 2];
 		IplImage * deCompImage = 0;
 
 		if (source.substr(source.find_last_of(".") + 1) == "klg") {
-			logReader = new RawLogReader(decompressionBuffer, deCompImage,
-					source);
+			logReader = new RawLogReader(decompressionBuffer, deCompImage, source);
 
 			numFrames = logReader->getNumFrames();
 
@@ -289,11 +291,9 @@ int SlamModule::main(std::string calibFile, std::string source, std::string ply,
 			imageSource = new LogReaderImageSource(logReader);
 		} else {
 			if (getdir(source, files) >= 0) {
-				printf("found %d image files in folder %s!\n",
-						(int) files.size(), source.c_str());
+				printf("found %d image files in folder %s!\n", (int) files.size(), source.c_str());
 			} else if (getFile(source, files) >= 0) {
-				printf("found %d image files in file %s!\n", (int) files.size(),
-						source.c_str());
+				printf("found %d image files in file %s!\n", (int) files.size(), source.c_str());
 			} else {
 				printf("could not load file list! wrong path / file?\n");
 			}
@@ -334,9 +334,14 @@ int SlamModule::main(std::string calibFile, std::string source, std::string ply,
 
 	}
 
+<<<<<<< HEAD
 	if (!shouldSavePly && !save) {
 		std::cout
 				<< "WARNING: You have not saved the point cloud to a file!\nUse -p nameoffile.ply to save your pointcloud (Use -nop to hide this message)\n";
+=======
+	if (!shouldSavePly && !(Parse::flag(argc, argv, "-nop") > 0)) {
+		std::cout << "WARNING: You have not saved the point cloud to a file!\nUse -p nameoffile.ply to save your pointcloud (Use -nop to hide this message)\n";
+>>>>>>> aa5edbf491d30e7661ac71d7cb2f8cf172e227e9
 	}
 
 	lsdDone.assignValue(true);
