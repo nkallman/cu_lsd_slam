@@ -139,12 +139,8 @@ int SlamModule::getFile(std::string source, std::vector<std::string> &files) {
 /**
  * Run SLAM inside main process.
  */
-<<<<<<< HEAD
 void SlamModule::run(lsd_slam::SlamSystem * system, lsd_slam::Undistorter* undistorter,
 		lsd_slam::Output3DWrapper* outputWrapper, Sophus::Matrix3f K) {
-=======
-static void SlamModule::run(lsd_slam::SlamSystem * system, lsd_slam::Undistorter* undistorter, lsd_slam::Output3DWrapper* outputWrapper, Sophus::Matrix3f K) {
->>>>>>> aa5edbf491d30e7661ac71d7cb2f8cf172e227e9
 	// get HZ
 	double hz = 30;
 
@@ -334,14 +330,9 @@ int SlamModule::main(std::string calibFile, std::string source, std::string ply,
 
 	}
 
-<<<<<<< HEAD
 	if (!shouldSavePly && !save) {
 		std::cout
 				<< "WARNING: You have not saved the point cloud to a file!\nUse -p nameoffile.ply to save your pointcloud (Use -nop to hide this message)\n";
-=======
-	if (!shouldSavePly && !(Parse::flag(argc, argv, "-nop") > 0)) {
-		std::cout << "WARNING: You have not saved the point cloud to a file!\nUse -p nameoffile.ply to save your pointcloud (Use -nop to hide this message)\n";
->>>>>>> aa5edbf491d30e7661ac71d7cb2f8cf172e227e9
 	}
 
 	lsdDone.assignValue(true);
